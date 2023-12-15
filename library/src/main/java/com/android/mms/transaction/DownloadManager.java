@@ -1,6 +1,7 @@
 
 package com.android.mms.transaction;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -72,8 +73,9 @@ public class DownloadManager {
         download.putExtra(MmsReceivedReceiver.EXTRA_TRIGGER_PUSH, byPush);
         download.putExtra(MmsReceivedReceiver.EXTRA_URI, uri);
         download.putExtra(MmsReceivedReceiver.SUBSCRIPTION_ID, subscriptionId);
+        @SuppressLint("WrongConstant")
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, 0, download, PendingIntent.FLAG_CANCEL_CURRENT);
+                context, 0, download, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         final SmsManager smsManager = SmsManagerFactory.createSmsManager(subscriptionId);
 

@@ -147,7 +147,7 @@ public class TransactionService extends Service implements Observer {
     private Looper mServiceLooper;
     private final ArrayList<Transaction> mProcessing  = new ArrayList<Transaction>();
     private final ArrayList<Transaction> mPending  = new ArrayList<Transaction>();
-    private ConnectivityManager mConnMgr;
+    private ConnectivityManager connectivityManager;
     private ConnectivityBroadcastReceiver mReceiver;
     private boolean mobileDataEnabled;
     private boolean lollipopReceiving = false;
@@ -248,13 +248,13 @@ public class TransactionService extends Service implements Observer {
     }
 
     private boolean isNetworkAvailable() {
-        if (mConnMgr == null) {
+        if (connectivityManager == null) {
             return false;
         } else if (Utils.isMmsOverWifiEnabled(this)) {
-            NetworkInfo niWF = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            NetworkInfo niWF = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
             return (niWF == null ? false : niWF.isConnected());
         } else {
-            NetworkInfo ni = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
+            NetworkInfo ni = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
             return (ni == null ? false : ni.isAvailable());
         }
     }
@@ -266,12 +266,12 @@ public class TransactionService extends Service implements Observer {
             mobileDataEnabled = true;
         }
 
-        mConnMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (!mobileDataEnabled) {
             Utils.setMobileDataEnabled(this, true);
         }
 
-        if (mConnMgr == null) {
+        if (connectivityManager == null) {
             endMmsConnectivity();
             stopSelf(serviceId);
             return;
@@ -670,28 +670,15 @@ public class TransactionService extends Service implements Observer {
         createWakeLock();
 
         if (Utils.isMmsOverWifiEnabled(this)) {
-            NetworkInfo niWF = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            NetworkInfo niWF = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
             if ((niWF != null) && (niWF.isConnected())) {
                 Log.v(TAG, "beginMmsConnectivity: Wifi active");
                 return 0;
             }
         }
 
-        int result = mConnMgr.startUsingNetworkFeature(
-                ConnectivityManager.TYPE_MOBILE, "enableMMS");
-
-        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-            Log.v(TAG, "beginMmsConnectivity: result=" + result);
-        }
-
-        switch (result) {
-            case 0:
-            case 1:
-                acquireWakeLock();
-                return result;
-        }
-
-        throw new IOException("Cannot establish MMS connectivity");
+        acquireWakeLock();
+        return 1;
     }
 
     protected void endMmsConnectivity() {
@@ -702,11 +689,6 @@ public class TransactionService extends Service implements Observer {
 
             // cancel timer for renewal of lease
             mServiceHandler.removeMessages(EVENT_CONTINUE_MMS_CONNECTIVITY);
-            if (mConnMgr != null && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                mConnMgr.stopUsingNetworkFeature(
-                        ConnectivityManager.TYPE_MOBILE,
-                        "enableMMS");
-            }
         } finally {
             releaseWakeLock();
         }
@@ -1102,8 +1084,8 @@ public class TransactionService extends Service implements Observer {
 
             NetworkInfo mmsNetworkInfo = null;
 
-            if (mConnMgr != null && Utils.isMobileDataEnabled(context)) {
-                mmsNetworkInfo = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
+            if (connectivityManager != null && Utils.isMobileDataEnabled(context)) {
+                mmsNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
             } else {
                 if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                     Log.v(TAG, "mConnMgr is null, bail");
