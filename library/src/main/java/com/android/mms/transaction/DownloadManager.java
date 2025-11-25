@@ -9,13 +9,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
 
@@ -36,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DownloadManager {
     private static final String TAG = "DownloadManager";
-    private static DownloadManager ourInstance = new DownloadManager();
+    private static final DownloadManager ourInstance = new DownloadManager();
     private static final ConcurrentHashMap<String, MmsDownloadReceiver> mMap = new ConcurrentHashMap<>();
 
     public static DownloadManager getInstance() {
@@ -53,6 +50,7 @@ public class DownloadManager {
         }
 
         MmsDownloadReceiver receiver = new MmsDownloadReceiver();
+        mMap.put(location, receiver);
         final String receiverAction = receiver.mAction;
 
         // Use unique receiverAction in order to avoid cancellation of notifying download result.
