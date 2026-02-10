@@ -1,21 +1,18 @@
 
 package com.android.mms.transaction;
 
+import static android.content.Context.RECEIVER_EXPORTED;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
 
@@ -36,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DownloadManager {
     private static final String TAG = "DownloadManager";
-    private static DownloadManager ourInstance = new DownloadManager();
+    private static final DownloadManager ourInstance = new DownloadManager();
     private static final ConcurrentHashMap<String, MmsDownloadReceiver> mMap = new ConcurrentHashMap<>();
 
     public static DownloadManager getInstance() {
@@ -47,7 +44,6 @@ public class DownloadManager {
 
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void downloadMultimediaMessage(final Context context, final String location, Uri uri, boolean byPush, int subscriptionId) {
         if (location == null || mMap.get(location) != null) {
             return;
@@ -55,9 +51,14 @@ public class DownloadManager {
 
         MmsDownloadReceiver receiver = new MmsDownloadReceiver();
         mMap.put(location, receiver);
+        final String receiverAction = receiver.mAction;
 
-        // Use unique action in order to avoid cancellation of notifying download result.
-        context.getApplicationContext().registerReceiver(receiver, new IntentFilter(receiver.mAction));
+        // Use unique receiverAction in order to avoid cancellation of notifying download result.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.getApplicationContext().registerReceiver(receiver, new IntentFilter(receiverAction), RECEIVER_EXPORTED);
+        } else {
+            context.getApplicationContext().registerReceiver(receiver, new IntentFilter(receiverAction));
+        }
 
         Log.v(TAG, "receiving with system method");
         final String fileName = "download." + Math.abs(new Random().nextLong()) + ".dat";
@@ -67,7 +68,7 @@ public class DownloadManager {
                 .path(fileName)
                 .scheme(ContentResolver.SCHEME_CONTENT)
                 .build();
-        Intent download = new Intent(receiver.mAction);
+        Intent download = new Intent(receiverAction);
         download.putExtra(MmsReceivedReceiver.EXTRA_FILE_PATH, mDownloadFile.getPath());
         download.putExtra(MmsReceivedReceiver.EXTRA_LOCATION_URL, location);
         download.putExtra(MmsReceivedReceiver.EXTRA_TRIGGER_PUSH, byPush);
@@ -75,17 +76,14 @@ public class DownloadManager {
         download.putExtra(MmsReceivedReceiver.SUBSCRIPTION_ID, subscriptionId);
         @SuppressLint("WrongConstant")
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context, 0, download, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE);
+                context, 0, download, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        final SmsManager smsManager = SmsManagerFactory.createSmsManager(subscriptionId);
+        final SmsManager smsManager = SmsManagerFactory.createSmsManager(context, subscriptionId);
 
         Bundle configOverrides = new Bundle();
         String httpParams = MmsConfig.getHttpParams();
         if (!TextUtils.isEmpty(httpParams)) {
             configOverrides.putString(SmsManager.MMS_CONFIG_HTTP_PARAMS, httpParams);
-        } else {
-            // this doesn't seem to always work...
-            // configOverrides = smsManager.getCarrierConfigValues();
         }
 
         grantUriPermission(context, contentUri);
