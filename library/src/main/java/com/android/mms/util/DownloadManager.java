@@ -32,7 +32,6 @@ import com.android.mms.logs.LogTag;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.internal.telephony.TelephonyProperties;
 import com.android.mms.service_alt.SystemPropertiesProxy;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.EncodedStringValue;
@@ -120,9 +119,7 @@ public class DownloadManager {
     }
 
     static boolean isRoaming(Context context) {
-        // TODO: fix and put in Telephony layer
-        String roaming = SystemPropertiesProxy.get(context,
-                TelephonyProperties.PROPERTY_OPERATOR_ISROAMING, null);
+        String roaming = SystemPropertiesProxy.get(context, "gsm.operator.isroaming", null);
         if (LOCAL_LOGV) {
             Log.v(TAG, "roaming ------> " + roaming);
         }
