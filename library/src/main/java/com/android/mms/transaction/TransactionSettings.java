@@ -24,7 +24,7 @@ import com.android.mms.MmsConfig;
 import com.klinker.android.send_message.Transaction;
 import com.klinker.android.send_message.Utils;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 
 /**
  * Container of transaction settings. Instances of this class are contained

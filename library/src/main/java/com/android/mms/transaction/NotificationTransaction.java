@@ -30,7 +30,7 @@ import android.provider.Telephony.Threads;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 import com.android.mms.MmsConfig;
 import com.android.mms.util.DownloadManager;
 import com.google.android.mms.MmsException;

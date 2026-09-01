@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.mms.logs;
+package com.android.mms;
 
 public class LogTag {
     public static final String TAG = "Mms";

@@ -18,7 +18,7 @@ package com.android.mms.dom.smil;
 
 import android.util.Log;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 
 import java.util.ArrayList;
 

@@ -34,7 +34,7 @@ import android.provider.Telephony.MmsSms;
 import android.provider.Telephony.MmsSms.PendingMessages;
 import android.util.Log;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 import com.android.mms.util.DownloadManager;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduPersister;

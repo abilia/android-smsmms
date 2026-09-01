@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.mms.MmsConfig;
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;

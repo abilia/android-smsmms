@@ -20,7 +20,7 @@ import android.util.Log;
 
 import java.util.HashMap;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 
 public class SendingProgressTokenManager {
     private static final String TAG = LogTag.TAG;

@@ -27,7 +27,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Telephony.Mms;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 
 import android.util.Log;
 import android.widget.Toast;
