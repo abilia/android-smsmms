@@ -37,7 +37,7 @@ import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Transaction;
 
@@ -327,7 +327,7 @@ public class DownloadRequest extends MmsRequest {
 
     private String getContentLocation(Context context, Uri uri)
             throws MmsException {
-        Cursor cursor = com.android.mms.SqliteWrapper.query(context, context.getContentResolver(),
+        Cursor cursor = SqliteWrapper.query(context, context.getContentResolver(),
                 uri, PROJECTION, null, null, null);
 
         if (cursor != null) {
@@ -349,7 +349,7 @@ public class DownloadRequest extends MmsRequest {
     private static Long getId(Context context, String location) {
         String selection = Telephony.Mms.CONTENT_LOCATION + " = ?";
         String[] selectionArgs = new String[] { location };
-        Cursor c = com.android.mms.SqliteWrapper.query(
+        Cursor c = SqliteWrapper.query(
                 context, context.getContentResolver(),
                 Telephony.Mms.CONTENT_URI, new String[] { Telephony.Mms._ID },
                 selection, selectionArgs, null);
@@ -375,7 +375,7 @@ public class DownloadRequest extends MmsRequest {
         uriBuilder.appendQueryParameter("protocol", "mms");
         uriBuilder.appendQueryParameter("message", String.valueOf(msgId));
 
-        Cursor cursor = com.android.mms.SqliteWrapper.query(context, context.getContentResolver(),
+        Cursor cursor = SqliteWrapper.query(context, context.getContentResolver(),
                 uriBuilder.build(), null, null, null, null);
         if (cursor == null) {
             return;
@@ -390,7 +390,7 @@ public class DownloadRequest extends MmsRequest {
                         Telephony.MmsSms.PendingMessages._ID);
                 long id = cursor.getLong(columnIndex);
 
-                com.android.mms.SqliteWrapper.update(context, context.getContentResolver(),
+                SqliteWrapper.update(context, context.getContentResolver(),
                         Telephony.MmsSms.PendingMessages.CONTENT_URI,
                         values, Telephony.MmsSms.PendingMessages._ID + "=" + id, null);
             }

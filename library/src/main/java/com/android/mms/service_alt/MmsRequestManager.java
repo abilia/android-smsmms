@@ -28,7 +28,7 @@ import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import com.klinker.android.send_message.Settings;
 
 public class MmsRequestManager implements MmsRequest.RequestManager {

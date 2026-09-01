@@ -28,9 +28,6 @@ import android.widget.Toast;
 
 import java.util.Objects;
 
-/**
- * @hide
- */
 public final class SqliteWrapper {
     private static final String TAG = "SqliteWrapper";
     private static final String SQLITE_EXCEPTION_DETAIL_MESSAGE = "unable to open database file";

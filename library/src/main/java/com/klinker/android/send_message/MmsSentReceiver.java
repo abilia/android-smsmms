@@ -23,7 +23,7 @@ import android.net.Uri;
 import android.provider.Telephony;
 import android.util.Log;
 
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 
 import java.io.File;
 

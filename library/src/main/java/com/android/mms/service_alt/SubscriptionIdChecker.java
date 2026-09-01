@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteException;
 import android.provider.Telephony;
 import android.util.Log;
 
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 
 public class SubscriptionIdChecker {
     private static final String TAG = "SubscriptionIdChecker";

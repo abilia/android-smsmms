@@ -56,7 +56,7 @@ import com.google.android.mms.pdu_alt.PduPart;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.SendReq;
 import com.google.android.mms.smil.SmilHelper;
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -19,7 +19,7 @@ import android.util.Log;
 
 import com.android.mms.service_alt.MmsNetworkManager;
 import com.android.mms.service_alt.exception.MmsNetworkException;
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
