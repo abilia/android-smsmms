@@ -1,11 +1,10 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdkVersion 31
-        targetSdkVersion 34
     }
 
     namespace = 'com.klinker.android.send_message'
