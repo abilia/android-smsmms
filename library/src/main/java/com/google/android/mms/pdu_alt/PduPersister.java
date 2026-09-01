@@ -27,7 +27,6 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteException;
 import android.drm.DrmManagerClient;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Telephony;
 import android.provider.Telephony.Mms;
@@ -70,11 +69,9 @@ import java.util.Set;
  */
 public class PduPersister {
     private static final String TAG = "PduPersister";
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     private static final long DUMMY_THREAD_ID = Long.MAX_VALUE;
-    private static final int DEFAULT_SUBSCRIPTION = 0;
     private static final int MAX_TEXT_BODY_SIZE = 300 * 1024;
 
     /**
@@ -86,14 +83,8 @@ public class PduPersister {
      * Indicate that we transiently failed to process a MM.
      */
     public static final int PROC_STATUS_TRANSIENT_FAILURE   = 1;
-    /**
-     * Indicate that we permanently failed to process a MM.
-     */
-    public static final int PROC_STATUS_PERMANENTLY_FAILURE = 2;
-    /**
-     * Indicate that we have successfully processed a MM.
-     */
-    public static final int PROC_STATUS_COMPLETED           = 3;
+
+
 
     private static PduPersister sPersister;
     private static final PduCache PDU_CACHE_INSTANCE;
@@ -1637,8 +1628,7 @@ public class PduPersister {
      * Check if read permissions for SMS have been granted
      */
     private boolean checkReadSmsPermissions() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                mContext.checkSelfPermission(Manifest.permission.READ_SMS) ==
-                        PackageManager.PERMISSION_GRANTED;
+        return mContext.checkSelfPermission(Manifest.permission.READ_SMS) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 }

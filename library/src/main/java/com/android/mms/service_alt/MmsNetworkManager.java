@@ -23,7 +23,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.NetworkInfo;
 import android.net.SSLCertificateSocketFactory;
-import android.os.Build;
 import android.os.SystemClock;
 
 import com.klinker.android.logger.Log;
@@ -89,18 +88,11 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         mSubId = subId;
 
         if (!MmsRequest.useWifi(context)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                mNetworkRequest = new NetworkRequest.Builder()
-                        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
-                        .setNetworkSpecifier(Integer.toString(mSubId))
-                        .build();
-            } else {
-                mNetworkRequest = new NetworkRequest.Builder()
-                        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
-                        .build();
-            }
+            mNetworkRequest = new NetworkRequest.Builder()
+                    .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
+                    .setNetworkSpecifier(Integer.toString(mSubId))
+                    .build();
         } else {
             mNetworkRequest = new NetworkRequest.Builder()
                     .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)

@@ -49,10 +49,10 @@ public interface Time {
     // TimeTypes
     public static final short SMIL_TIME_INDEFINITE      = 0;
     public static final short SMIL_TIME_OFFSET          = 1;
-    public static final short SMIL_TIME_SYNC_BASED      = 2;
-    public static final short SMIL_TIME_EVENT_BASED     = 3;
-    public static final short SMIL_TIME_WALLCLOCK       = 4;
-    public static final short SMIL_TIME_MEDIA_MARKER    = 5;
+
+
+
+
 
     /**
      *  A code representing the type of the underlying object, as defined 

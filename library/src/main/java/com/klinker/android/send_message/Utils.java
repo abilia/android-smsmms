@@ -1,13 +1,11 @@
 package com.klinker.android.send_message;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
@@ -23,7 +21,6 @@ import com.google.android.mms.util_alt.SqliteWrapper;
 import com.klinker.android.logger.Log;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -39,10 +36,6 @@ import java.util.regex.Pattern;
  * @author Jake Klinker
  */
 public class Utils {
-    /**
-     * characters to compare against when checking for 160 character sending compatibility
-     */
-    public static final String GSM_CHARACTERS_REGEX = "^[A-Za-z0-9 \\r\\n@Ł$ĽčéůěňÇŘřĹĺ\u0394_\u03A6\u0393\u039B\u03A9\u03A0\u03A8\u03A3\u0398\u039EĆćßÉ!\"#$%&'()*+,\\-./:;<=>?ĄÄÖŃÜ§żäöńüŕ^{}\\\\\\[~\\]|\u20AC]*$";
     private static final String TAG = "Utils";
     public static final int DEFAULT_SUBSCRIPTION_ID = 1;
 
@@ -64,12 +57,10 @@ public class Utils {
         if (DEFAULT_SUBSCRIPTION_ID == subscriptionId) {
             return getMyPhoneNumber(context);
         } else {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
-                SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
-                SubscriptionInfo subscriptionInfo = subscriptionManager.getActiveSubscriptionInfo(subscriptionId);
-                if (subscriptionInfo != null) {
-                    return subscriptionInfo.getNumber();
-                }
+            SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
+            SubscriptionInfo subscriptionInfo = subscriptionManager.getActiveSubscriptionInfo(subscriptionId);
+            if (subscriptionInfo != null) {
+                return subscriptionInfo.getNumber();
             }
 
             return getMyPhoneNumber(context);
@@ -81,18 +72,6 @@ public class Utils {
     }
 
     public static <T> T ensureRouteToMmsNetwork(Context context, String url, String proxy, Task<T> task) throws IOException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return ensureRouteToMmsNetworkMarshmallow(context, task);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return ensureRouteToMmsNetworkLollipop(context, task);
-        } else {
-            ensureRouteToHost(context, url, proxy);
-            return task.run();
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private static <T> T ensureRouteToMmsNetworkMarshmallow(Context context, Task<T> task) throws IOException {
         final MmsNetworkManager networkManager = new MmsNetworkManager(context.getApplicationContext(), Utils.getDefaultSubscriptionId());
         final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = null;
@@ -105,24 +84,6 @@ public class Utils {
         } finally {
             if (network != null) {
                 connectivityManager.bindProcessToNetwork(null);
-            }
-            networkManager.releaseNetwork();
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private static <T> T ensureRouteToMmsNetworkLollipop(Context context, Task<T> task) throws IOException {
-        final MmsNetworkManager networkManager = new MmsNetworkManager(context.getApplicationContext(), Utils.getDefaultSubscriptionId());
-        Network network = null;
-        try {
-            network = networkManager.acquireNetwork();
-            ConnectivityManager.setProcessDefaultNetwork(network);
-            return task.run();
-        } catch (MmsNetworkException e) {
-            throw new IOException(e);
-        } finally {
-            if (network != null) {
-                ConnectivityManager.setProcessDefaultNetwork(null);
             }
             networkManager.releaseNetwork();
         }
@@ -234,42 +195,23 @@ public class Utils {
      * @param enabled is whether to enable or disable data
      */
     public static void setMobileDataEnabled(Context context, boolean enabled) {
-        String methodName;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                ConnectivityManager conman = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                Class conmanClass = Class.forName(conman.getClass().getName());
-                Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
-                iConnectivityManagerField.setAccessible(true);
-                Object iConnectivityManager = iConnectivityManagerField.get(conman);
-                Class iConnectivityManagerClass = Class.forName(iConnectivityManager.getClass().getName());
-                Method setMobileDataEnabledMethod = iConnectivityManagerClass.getDeclaredMethod("setMobileDataEnabled", Boolean.TYPE);
-                setMobileDataEnabledMethod.setAccessible(true);
-
-                setMobileDataEnabledMethod.invoke(iConnectivityManager, enabled);
-            } catch (Exception e) {
-                Log.e(TAG, "exception thrown", e);
-            }
-        } else {
-            // TODO find a better way to do this on lollipop!
-            // This will actually not work due to no permission for android.permission.MODIFY_PHONE_STATE, which
-            // is a system level permission and cannot be accessed for third party apps.
-            try {
-                TelephonyManager tm = (TelephonyManager) context
-                        .getSystemService(Context.TELEPHONY_SERVICE);
-                Class c = Class.forName(tm.getClass().getName());
-                Method m = c.getDeclaredMethod("getITelephony");
-                m.setAccessible(true);
-                Object telephonyService = m.invoke(tm);
-                c = Class.forName(telephonyService.getClass().getName());
-                m = c.getDeclaredMethod("setDataEnabled", Boolean.TYPE);
-                m.setAccessible(true);
-                m.invoke(telephonyService, enabled);
-            } catch (Exception e) {
-                Log.e(TAG, "error enabling data on lollipop", e);
-            }
+        // TODO find a better way to do this on lollipop!
+        // This will actually not work due to no permission for android.permission.MODIFY_PHONE_STATE, which
+        // is a system level permission and cannot be accessed for third party apps.
+        try {
+            TelephonyManager tm = (TelephonyManager) context
+                    .getSystemService(Context.TELEPHONY_SERVICE);
+            Class c = Class.forName(tm.getClass().getName());
+            Method m = c.getDeclaredMethod("getITelephony");
+            m.setAccessible(true);
+            Object telephonyService = m.invoke(tm);
+            c = Class.forName(telephonyService.getClass().getName());
+            m = c.getDeclaredMethod("setDataEnabled", Boolean.TYPE);
+            m.setAccessible(true);
+            m.invoke(telephonyService, enabled);
+        } catch (Exception e) {
+            Log.e(TAG, "error enabling data on lollipop", e);
         }
-
     }
 
     /**
@@ -341,18 +283,6 @@ public class Utils {
         //throw new IllegalArgumentException("Unable to find or allocate a thread ID.");
     }
 
-    public static boolean doesThreadIdExist(Context context, long threadId) {
-        Uri uri = Uri.parse("content://mms-sms/conversations/" + threadId + "/");
-
-        Cursor cursor = context.getContentResolver().query(uri, new String[] {"_id"}, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            cursor.close();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     private static boolean isEmailAddress(String address) {
         if (TextUtils.isEmpty(address)) {
             return false;
@@ -414,24 +344,12 @@ public class Utils {
     }
 
     /**
-     * Determines whether or not the user has Android 4.4 KitKat
-     * @return true if version code on device is >= kitkat
-     */
-    public static boolean hasKitKat() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-    }
-
-    /**
      * Determines whether or not the app is the default SMS app on a device
      * @param context
      * @return true if app is default
      */
     public static boolean isDefaultSmsApp(Context context) {
-        if (hasKitKat()) {
-            return context.getPackageName().equals(Telephony.Sms.getDefaultSmsPackage(context));
-        }
-
-        return true;
+        return context.getPackageName().equals(Telephony.Sms.getDefaultSmsPackage(context));
     }
 
     /**
@@ -444,10 +362,6 @@ public class Utils {
     }
 
     public static int getDefaultSubscriptionId() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            return SmsManager.getDefaultSmsSubscriptionId();
-        } else {
-            return DEFAULT_SUBSCRIPTION_ID;
-        }
+        return SmsManager.getDefaultSmsSubscriptionId();
     }
 }

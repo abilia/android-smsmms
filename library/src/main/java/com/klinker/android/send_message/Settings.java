@@ -16,9 +16,6 @@
 
 package com.klinker.android.send_message;
 
-import android.net.wifi.WifiInfo;
-import android.os.Build;
-
 import com.klinker.android.logger.Log;
 
 /**
@@ -254,12 +251,7 @@ public class Settings {
      * @param useSystemSending whether or not to use the system sending method on Lollipop+ devices
      */
     public void setUseSystemSending(boolean useSystemSending) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            this.useSystemSending = useSystemSending;
-        } else {
-            this.useSystemSending = false;
-            Log.e("Settings", "System sending only available on Lollipop+ devices");
-        }
+        this.useSystemSending = useSystemSending;
     }
 
     /**
@@ -268,8 +260,7 @@ public class Settings {
      * @param subscriptionId null if you do not want to use one.
      */
     public void setSubscriptionId(Integer subscriptionId) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1 || subscriptionId == null) {
-            // we won't allow you to go away from the default if your device doesn't support it
+        if (subscriptionId == null) {
             this.subscriptionId = DEFAULT_SUBSCRIPTION_ID;
         } else {
             this.subscriptionId = subscriptionId;

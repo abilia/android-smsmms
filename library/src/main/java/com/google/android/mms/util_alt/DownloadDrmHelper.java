@@ -26,34 +26,10 @@ public class DownloadDrmHelper {
     /** The MIME type of special DRM files */
     public static final String MIMETYPE_DRM_MESSAGE = "application/vnd.oma.drm.message";
 
-    /** The extensions of special DRM files */
-    public static final String EXTENSION_DRM_MESSAGE = ".dm";
 
-    public static final String EXTENSION_INTERNAL_FWDL = ".fl";
 
-    /**
-     * Checks if the Media Type is a DRM Media Type
-     *
-     * @param mimetype Media Type to check
-     * @return True if the Media Type is DRM else false
-     */
-    public static boolean isDrmMimeType(Context context, String mimetype) {
-        boolean result = false;
-        if (context != null) {
-            try {
-                DrmManagerClient drmClient = new DrmManagerClient(context);
-                if (drmClient != null && mimetype != null && mimetype.length() > 0) {
-                    result = drmClient.canHandle("", mimetype);
-                }
-            } catch (IllegalArgumentException e) {
-                Log.w(TAG,
-                        "DrmManagerClient instance could not be created, context is Illegal.");
-            } catch (IllegalStateException e) {
-                Log.w(TAG, "DrmManagerClient didn't initialize properly.");
-            }
-        }
-        return result;
-    }
+
+
 
     /**
      * Checks if the Media Type needs to be DRM converted
@@ -65,21 +41,7 @@ public class DownloadDrmHelper {
         return MIMETYPE_DRM_MESSAGE.equals(mimetype);
     }
 
-    /**
-     * Modifies the file extension for a DRM Forward Lock file NOTE: This
-     * function shouldn't be called if the file shouldn't be DRM converted
-     */
-    public static String modifyDrmFwLockFileExtension(String filename) {
-        if (filename != null) {
-            int extensionIndex;
-            extensionIndex = filename.lastIndexOf(".");
-            if (extensionIndex != -1) {
-                filename = filename.substring(0, extensionIndex);
-            }
-            filename = filename.concat(EXTENSION_INTERNAL_FWDL);
-        }
-        return filename;
-    }
+
 
     /**
      * Gets the original mime type of DRM protected content.

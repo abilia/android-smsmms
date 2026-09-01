@@ -28,7 +28,6 @@ import android.database.sqlite.SqliteWrapper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -309,130 +308,48 @@ public class TransactionService extends Service implements Observer {
                     }
 
                     int columnIndexOfMsgId = cursor.getColumnIndexOrThrow(PendingMessages.MSG_ID);
-                    int columnIndexOfMsgType = cursor.getColumnIndexOrThrow(
-                            PendingMessages.MSG_TYPE);
 
                     while (cursor.moveToNext()) {
-                        int msgType = cursor.getInt(columnIndexOfMsgType);
-                        int transactionType = getTransactionType(msgType);
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            boolean useSystem = true;
-                            int subId = Settings.DEFAULT_SUBSCRIPTION_ID;
-                            if (com.klinker.android.send_message.Transaction.settings != null) {
-                                useSystem = com.klinker.android.send_message.Transaction.settings
-                                        .getUseSystemSending();
-                                subId = com.klinker.android.send_message.Transaction.settings.getSubscriptionId();
-                            } else {
-                                useSystem = PreferenceManager.getDefaultSharedPreferences(this)
-                                        .getBoolean("system_mms_sending", useSystem);
-                            }
-
-                            if (useSystem) {
-                                try {
-                                    Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
-                                            cursor.getLong(columnIndexOfMsgId));
-                                    com.android.mms.transaction.DownloadManager.getInstance().
-                                            downloadMultimediaMessage(this, PushReceiver.getContentLocation(this, uri), uri, false, subId);
-
-                                    // can't handle many messages at once.
-                                    break;
-                                } catch (MmsException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                try {
-                                    Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
-                                            cursor.getLong(columnIndexOfMsgId));
-                                    MmsRequestManager requestManager = new MmsRequestManager(this);
-                                    DownloadRequest request = new DownloadRequest(requestManager,
-                                            Utils.getDefaultSubscriptionId(),
-                                            PushReceiver.getContentLocation(this, uri), uri, null, null,
-                                            null, this);
-                                    MmsNetworkManager manager = new MmsNetworkManager(this, Utils.getDefaultSubscriptionId());
-                                    request.execute(this, manager);
-
-                                    // can't handle many messages at once.
-                                    break;
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            continue;
+                        boolean useSystem = true;
+                        int subId = Settings.DEFAULT_SUBSCRIPTION_ID;
+                        if (com.klinker.android.send_message.Transaction.settings != null) {
+                            useSystem = com.klinker.android.send_message.Transaction.settings
+                                    .getUseSystemSending();
+                            subId = com.klinker.android.send_message.Transaction.settings.getSubscriptionId();
+                        } else {
+                            useSystem = PreferenceManager.getDefaultSharedPreferences(this)
+                                    .getBoolean("system_mms_sending", useSystem);
                         }
 
-                        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                            Log.v(TAG, "onNewIntent: msgType=" + msgType + " transactionType=" +
-                                    transactionType);
-                        }
-                        if (noNetwork) {
-                            onNetworkUnavailable(serviceId, transactionType);
-                            return;
-                        }
-                        switch (transactionType) {
-                            case -1:
-                                break;
-                            case Transaction.RETRIEVE_TRANSACTION:
-                                // If it's a transiently failed transaction,
-                                // we should retry it in spite of current
-                                // downloading mode. If the user just turned on the auto-retrieve
-                                // option, we also retry those messages that don't have any errors.
-                                int failureType = cursor.getInt(
-                                        cursor.getColumnIndexOrThrow(
-                                                PendingMessages.ERROR_TYPE));
-                                try {
-                                    DownloadManager.init(this);
-                                    DownloadManager downloadManager = DownloadManager.getInstance();
-                                    boolean autoDownload = downloadManager.isAuto();
-                                    if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                                        Log.v(TAG, "onNewIntent: failureType=" + failureType +
-                                                " action=" + action + " isTransientFailure:" +
-                                                isTransientFailure(failureType) + " autoDownload=" +
-                                                autoDownload);
-                                    }
-                                    if (!autoDownload) {
-                                        // If autodownload is turned off, don't process the
-                                        // transaction.
-                                        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                                            Log.v(TAG, "onNewIntent: skipping - autodownload off");
-                                        }
-                                        // Re-enable "download" button if auto-download is off
-                                        Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
-                                                cursor.getLong(columnIndexOfMsgId));
-                                        downloadManager.markState(uri,
-                                                DownloadManager.STATE_SKIP_RETRYING);
-                                        break;
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                                // Logic is twisty. If there's no failure or the failure
-                                // is a non-permanent failure, we want to process the transaction.
-                                // Otherwise, break out and skip processing this transaction.
-                                if (!(failureType == MmsSms.NO_ERROR ||
-                                        isTransientFailure(failureType))) {
-                                    if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                                        Log.v(TAG, "onNewIntent: skipping - permanent error");
-                                    }
-                                    break;
-                                }
-                                if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                                    Log.v(TAG, "onNewIntent: falling through and processing");
-                                }
-                               // fall-through
-                            default:
-                                Uri uri = ContentUris.withAppendedId(
-                                        Mms.CONTENT_URI,
+                        if (useSystem) {
+                            try {
+                                Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
                                         cursor.getLong(columnIndexOfMsgId));
-                                TransactionBundle args = new TransactionBundle(
-                                        transactionType, uri.toString());
-                                // FIXME: We use the same startId for all MMs.
-                                if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                                    Log.v(TAG, "onNewIntent: launchTransaction uri=" + uri);
-                                }
-                                launchTransaction(serviceId, args, false);
+                                com.android.mms.transaction.DownloadManager.getInstance().
+                                        downloadMultimediaMessage(this, PushReceiver.getContentLocation(this, uri), uri, false, subId);
+
+                                // can't handle many messages at once.
                                 break;
+                            } catch (MmsException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+                                Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
+                                        cursor.getLong(columnIndexOfMsgId));
+                                MmsRequestManager requestManager = new MmsRequestManager(this);
+                                DownloadRequest request = new DownloadRequest(requestManager,
+                                        Utils.getDefaultSubscriptionId(),
+                                        PushReceiver.getContentLocation(this, uri), uri, null, null,
+                                        null, this);
+                                MmsNetworkManager manager = new MmsNetworkManager(this, Utils.getDefaultSubscriptionId());
+                                request.execute(this, manager);
+
+                                // can't handle many messages at once.
+                                break;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 } finally {
@@ -467,23 +384,6 @@ public class TransactionService extends Service implements Observer {
         }
     }
 
-    private static boolean isTransientFailure(int type) {
-        return type > MmsSms.NO_ERROR && type < MmsSms.ERR_TYPE_GENERIC_PERMANENT;
-    }
-
-    private int getTransactionType(int msgType) {
-        switch (msgType) {
-            case PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND:
-                return Transaction.RETRIEVE_TRANSACTION;
-            case PduHeaders.MESSAGE_TYPE_READ_REC_IND:
-                return Transaction.READREC_TRANSACTION;
-            case PduHeaders.MESSAGE_TYPE_SEND_REQ:
-                return Transaction.SEND_TRANSACTION;
-            default:
-                Log.w(TAG, "Unrecognized MESSAGE_TYPE: " + msgType);
-                return -1;
-        }
-    }
 
     private void launchTransaction(int serviceId, TransactionBundle txnBundle, boolean noNetwork) {
         if (noNetwork) {
@@ -838,15 +738,11 @@ public class TransactionService extends Service implements Observer {
                                         TransactionService.this, serviceId,
                                         transactionSettings, args.getUri());
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    Uri u = Uri.parse(args.getUri());
-                                    com.android.mms.transaction.DownloadManager.getInstance().
-                                            downloadMultimediaMessage(TransactionService.this,
-                                                    ((RetrieveTransaction) transaction).getContentLocation(TransactionService.this, u), u, false, Settings.DEFAULT_SUBSCRIPTION_ID);
-                                    return;
-                                }
-
-                                break;
+                                Uri u = Uri.parse(args.getUri());
+                                com.android.mms.transaction.DownloadManager.getInstance().
+                                        downloadMultimediaMessage(TransactionService.this,
+                                                ((RetrieveTransaction) transaction).getContentLocation(TransactionService.this, u), u, false, Settings.DEFAULT_SUBSCRIPTION_ID);
+                                return;
                             case Transaction.SEND_TRANSACTION:
                                 transaction = new SendTransaction(
                                         TransactionService.this, serviceId,

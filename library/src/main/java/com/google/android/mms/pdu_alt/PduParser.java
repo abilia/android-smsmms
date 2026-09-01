@@ -82,7 +82,6 @@ public class PduParser {
      * The log tag.
      */
     private static final String LOG_TAG = "PduParser";
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     /**

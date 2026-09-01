@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public abstract class StatusUpdatedReceiver extends BroadcastReceiver {
+abstract class StatusUpdatedReceiver extends BroadcastReceiver {
 
     // Updates the status of the message in the internal database
     public abstract void updateInInternalDatabase(Context context, Intent intent, int receiverResultCode);

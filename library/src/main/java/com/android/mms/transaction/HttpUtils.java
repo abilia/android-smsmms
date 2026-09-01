@@ -48,13 +48,10 @@ import com.android.mms.MmsConfig;
 public class HttpUtils {
     private static final String TAG = LogTag.TRANSACTION;
 
-    private static final boolean DEBUG = false;
-    private static final boolean LOCAL_LOGV = DEBUG ? Config.LOGD : Config.LOGV;
 
     public static final int HTTP_POST_METHOD = 1;
     public static final int HTTP_GET_METHOD = 2;
 
-    private static final int MMS_READ_BUFFER = 4096;
 
     // This is the value to use for the "Accept-Language" header.
     // Once it becomes possible for the user to change the locale

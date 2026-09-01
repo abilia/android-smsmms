@@ -35,7 +35,6 @@ public class SmilMediaElementImpl extends SmilElementImpl implements
     public final static String SMIL_MEDIA_PAUSE_EVENT = "SmilMediaPause";
     public final static String SMIL_MEDIA_SEEK_EVENT = "SmilMediaSeek";
     private final static String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     ElementTime mElementTime = new ElementTimeImpl(this) {

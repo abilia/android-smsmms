@@ -18,7 +18,6 @@ package com.android.mms.service_alt;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
-import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
@@ -256,21 +255,7 @@ public class MmsConfig {
         return false;
     }
 
-    /**
-     * Check a key and its type match the predefined keys and corresponding types
-     *
-     * @param key The key of the config
-     * @param value The value of the config
-     * @return True if key and type both matches and false otherwise
-     */
-    public static boolean isValidValue(String key, Object value) {
-        if (!TextUtils.isEmpty(key) && DEFAULTS.containsKey(key)) {
-            Object defVal = DEFAULTS.get(key);
-            Class<?> valueType = defVal != null ? defVal.getClass() : String.class;
-            return value.getClass().equals(valueType);
-        }
-        return false;
-    }
+
 
     private String mUserAgent = null;
     private String mUaProfUrl = null;
@@ -338,16 +323,11 @@ public class MmsConfig {
         final TelephonyManager telephonyManager =
                 (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mUserAgent = telephonyManager.getMmsUserAgent();
-            mUaProfUrl = telephonyManager.getMmsUAProfUrl();
-            // defaults for nexus 6, seems to work well.
-            //mUserAgent = "nexus6";
-            //mUaProfUrl = "http://uaprof.motorola.com/phoneconfig/nexus6/Profile/nexus6.rdf";
-        } else {
-            mUserAgent = "Android Messaging";
-            mUaProfUrl = "http://www.gstatic.com/android/hangouts/hangouts_mms_ua_profile.xml";
-        }
+        mUserAgent = telephonyManager.getMmsUserAgent();
+        mUaProfUrl = telephonyManager.getMmsUAProfUrl();
+        // defaults for nexus 6, seems to work well.
+        //mUserAgent = "nexus6";
+        //mUaProfUrl = "http://uaprof.motorola.com/phoneconfig/nexus6/Profile/nexus6.rdf";
     }
 
     private void loadFromResources(Context context) {
@@ -558,15 +538,11 @@ public class MmsConfig {
             final TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(
                     Context.TELEPHONY_SERVICE);
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
+            try {
+                Method method = telephonyManager.getClass().getMethod("getLine1NumberForSubscriber", int.class);
+                return (String) method.invoke(telephonyManager, subId);
+            } catch (Exception e) {
                 return telephonyManager.getLine1Number();
-            } else {
-                try {
-                    Method method = telephonyManager.getClass().getMethod("getLine1NumberForSubscriber", int.class);
-                    return (String) method.invoke(telephonyManager, subId);
-                } catch (Exception e) {
-                    return telephonyManager.getLine1Number();
-                }
             }
         }
 
@@ -588,16 +564,12 @@ public class MmsConfig {
 
             String nai = "";
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
+            try {
+                Method method = telephonyManager.getClass().getMethod("getNai", int.class);
+                Method getSlotId = SubscriptionManager.class.getMethod("getSlotId", int.class);
+                nai = (String) method.invoke(telephonyManager, getSlotId.invoke(null, subId));
+            } catch (Exception e) {
                 nai = SystemPropertiesProxy.get(context, "persist.radio.cdma.nai");
-            } else {
-                try {
-                    Method method = telephonyManager.getClass().getMethod("getNai", int.class);
-                    Method getSlotId = SubscriptionManager.class.getMethod("getSlotId", int.class);
-                    nai = (String) method.invoke(telephonyManager, getSlotId.invoke(null, subId));
-                } catch (Exception e) {
-                    nai = SystemPropertiesProxy.get(context, "persist.radio.cdma.nai");
-                }
             }
 
             if (Log.isLoggable(TAG, Log.VERBOSE)) {

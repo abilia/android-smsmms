@@ -22,9 +22,7 @@ import java.util.ArrayList;
 
 public class ContentType {
     public static final String MMS_MESSAGE       = "application/vnd.wap.mms-message";
-    // The phony content type for generic PDUs (e.g. ReadOrig.ind,
-    // Notification.ind, Delivery.ind).
-    public static final String MMS_GENERIC       = "application/vnd.wap.mms-generic";
+
     public static final String MULTIPART_MIXED   = "application/vnd.wap.multipart.mixed";
     public static final String MULTIPART_RELATED = "application/vnd.wap.multipart.related";
     public static final String MULTIPART_ALTERNATIVE = "application/vnd.wap.multipart.alternative";
@@ -35,7 +33,6 @@ public class ContentType {
     public static final String TEXT_VCALENDAR    = "text/x-vCalendar";
     public static final String TEXT_VCARD        = "text/x-vCard";
 
-    public static final String IMAGE_UNSPECIFIED = "image/*";
     public static final String IMAGE_JPEG        = "image/jpeg";
     public static final String IMAGE_JPG         = "image/jpg";
     public static final String IMAGE_GIF         = "image/gif";
@@ -43,7 +40,6 @@ public class ContentType {
     public static final String IMAGE_PNG         = "image/png";
     public static final String IMAGE_X_MS_BMP    = "image/x-ms-bmp";
 
-    public static final String AUDIO_UNSPECIFIED = "audio/*";
     public static final String AUDIO_AAC         = "audio/aac";
     public static final String AUDIO_AAC_MP4     = "audio/aac_mp4";
     public static final String AUDIO_QCELP       = "audio/qcelp";
@@ -67,7 +63,6 @@ public class ContentType {
     public static final String AUDIO_X_WAV       = "audio/x-wav";
     public static final String AUDIO_OGG         = "application/ogg";
 
-    public static final String VIDEO_UNSPECIFIED = "video/*";
     public static final String VIDEO_3GPP        = "video/3gpp";
     public static final String VIDEO_3G2         = "video/3gpp2";
     public static final String VIDEO_H263        = "video/h263";
@@ -181,21 +176,9 @@ public class ContentType {
         return (null != contentType) && sSupportedContentTypes.contains(contentType);
     }
 
-    public static boolean isSupportedImageType(String contentType) {
-        return isImageType(contentType) && isSupportedType(contentType);
-    }
 
-    public static boolean isSupportedAudioType(String contentType) {
-        return isAudioType(contentType) && isSupportedType(contentType);
-    }
 
-    public static boolean isSupportedVideoType(String contentType) {
-        return isVideoType(contentType) && isSupportedType(contentType);
-    }
 
-    public static boolean isTextType(String contentType) {
-        return (null != contentType) && contentType.startsWith("text/");
-    }
 
     public static boolean isImageType(String contentType) {
         return (null != contentType) && contentType.startsWith("image/");
@@ -209,33 +192,9 @@ public class ContentType {
         return (null != contentType) && contentType.startsWith("video/");
     }
 
-    public static boolean isDrmType(String contentType) {
-        return (null != contentType)
-                && (contentType.equals(APP_DRM_CONTENT)
-                        || contentType.equals(APP_DRM_MESSAGE));
-    }
 
-    public static boolean isUnspecified(String contentType) {
-        return (null != contentType) && contentType.endsWith("*");
-    }
 
-    @SuppressWarnings("unchecked")
-    public static ArrayList<String> getImageTypes() {
-        return (ArrayList<String>) sSupportedImageTypes.clone();
-    }
 
-    @SuppressWarnings("unchecked")
-    public static ArrayList<String> getAudioTypes() {
-        return (ArrayList<String>) sSupportedAudioTypes.clone();
-    }
 
-    @SuppressWarnings("unchecked")
-    public static ArrayList<String> getVideoTypes() {
-        return (ArrayList<String>) sSupportedVideoTypes.clone();
-    }
 
-    @SuppressWarnings("unchecked")
-    public static ArrayList<String> getSupportedTypes() {
-        return (ArrayList<String>) sSupportedContentTypes.clone();
-    }
 }

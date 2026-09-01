@@ -48,7 +48,6 @@ public class SmilRegionElementImpl extends SmilElementImpl implements
     private static final String BOTTOM_ATTRIBUTE_NAME = "bottom";
     private static final String FIT_ATTRIBUTE_NAME = "fit";
     private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     SmilRegionElementImpl(SmilDocumentImpl owner, String tagName) {

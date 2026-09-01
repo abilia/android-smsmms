@@ -16,12 +16,13 @@
 
 package com.klinker.android.send_message;
 
+import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_RETRIEVED;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -53,8 +54,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_RETRIEVED;
 
 public abstract class MmsReceivedReceiver extends BroadcastReceiver {
     private static final String TAG = "MmsReceivedReceiver";
@@ -154,19 +153,17 @@ public abstract class MmsReceivedReceiver extends BroadcastReceiver {
     }
 
     private void handleHttpError(Context context, Intent intent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            final int httpError = intent.getIntExtra(SmsManager.EXTRA_MMS_HTTP_STATUS, 0);
-            if (httpError == 404 || httpError == 400) {
-                // Delete the corresponding NotificationInd
-                SqliteWrapper.delete(context,
-                        context.getContentResolver(),
-                        Telephony.Mms.CONTENT_URI,
-                        LOCATION_SELECTION,
-                        new String[]{
-                                Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
-                                intent.getStringExtra(EXTRA_LOCATION_URL)
-                        });
-            }
+        final int httpError = intent.getIntExtra(SmsManager.EXTRA_MMS_HTTP_STATUS, 0);
+        if (httpError == 404 || httpError == 400) {
+            // Delete the corresponding NotificationInd
+            SqliteWrapper.delete(context,
+                    context.getContentResolver(),
+                    Telephony.Mms.CONTENT_URI,
+                    LOCATION_SELECTION,
+                    new String[]{
+                            Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
+                            intent.getStringExtra(EXTRA_LOCATION_URL)
+                    });
         }
     }
 

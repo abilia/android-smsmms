@@ -31,7 +31,6 @@ import java.util.Collection;
  */
 public class NetworkUtilsHelper {
 
-    private static final String TAG = "NetworkUtils";
 
     /**
      * Bring the named network interface up.
@@ -53,10 +52,7 @@ public class NetworkUtilsHelper {
      */
     public static final int RESET_IPV6_ADDRESSES = 0x02;
 
-    /**
-     * Reset all addresses
-     */
-    public static final int RESET_ALL_ADDRESSES = RESET_IPV4_ADDRESSES | RESET_IPV6_ADDRESSES;
+
 
     /**
      * Reset IPv6 or IPv4 sockets that are connected via the named interface.
@@ -117,23 +113,7 @@ public class NetworkUtilsHelper {
      */
     public native static String getDhcpError();
 
-    /**
-     * Convert a IPv4 address from an integer to an InetAddress.
-     *
-     * @param hostAddress an int corresponding to the IPv4 address in network byte order
-     */
-    public static InetAddress intToInetAddress(int hostAddress) {
-        byte[] addressBytes = {(byte) (0xff & hostAddress),
-                (byte) (0xff & (hostAddress >> 8)),
-                (byte) (0xff & (hostAddress >> 16)),
-                (byte) (0xff & (hostAddress >> 24))};
 
-        try {
-            return InetAddress.getByAddress(addressBytes);
-        } catch (UnknownHostException e) {
-            throw new AssertionError();
-        }
-    }
 
     /**
      * Convert a IPv4 address from an InetAddress to an integer
@@ -166,15 +146,7 @@ public class NetworkUtilsHelper {
         return Integer.reverseBytes(value);
     }
 
-    /**
-     * Convert a IPv4 netmask integer to a prefix length
-     *
-     * @param netmask as an integer in network byte order
-     * @return the network prefix length
-     */
-    public static int netmaskIntToPrefixLength(int netmask) {
-        return Integer.bitCount(netmask);
-    }
+
 
     /**
      * Create an InetAddress from a string where the string must be a standard
@@ -260,20 +232,7 @@ public class NetworkUtilsHelper {
         }
     }
 
-    /**
-     * Create a string array of host addresses from a collection of InetAddresses
-     *
-     * @param addrs a Collection of InetAddresses
-     * @return an array of Strings containing their host addresses
-     */
-    public static String[] makeStrings(Collection<InetAddress> addrs) {
-        String[] result = new String[addrs.size()];
-        int i = 0;
-        for (InetAddress addr : addrs) {
-            result[i++] = addr.getHostAddress();
-        }
-        return result;
-    }
+
 
     /**
      * Trim leading zeros from IPv4 address strings

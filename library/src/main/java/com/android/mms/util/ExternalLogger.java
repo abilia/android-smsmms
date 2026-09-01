@@ -18,15 +18,7 @@ public class ExternalLogger {
         sListener.add(listener);
     }
 
-    public static void removeListener(LoggingListener listener) {
-        sListener.remove(listener);
-    }
 
-    public static void logException(String tag, Throwable e) {
-        for (LoggingListener listener: sListener) {
-            listener.onLogException(tag, e);
-        }
-    }
 
     public static void logMessage(String tag, String message) {
         for (LoggingListener listener: sListener) {
