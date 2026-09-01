@@ -17,7 +17,7 @@
 package com.android.mms.transaction;
 
 import android.content.Context;
-import android.net.NetworkUtilsHelper;
+import com.android.mms.NetworkUtilsHelper;
 import android.util.Log;
 
 import com.android.mms.MmsConfig;

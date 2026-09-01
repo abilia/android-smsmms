@@ -20,7 +20,7 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import android.net.Uri;
 import android.os.Looper;
 import android.preference.PreferenceManager;

@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package android.database.sqlite;
+package com.android.mms;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;

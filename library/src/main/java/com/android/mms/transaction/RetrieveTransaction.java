@@ -21,7 +21,7 @@ import java.io.IOException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Telephony.Mms;

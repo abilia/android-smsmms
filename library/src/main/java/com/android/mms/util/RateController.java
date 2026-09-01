@@ -23,7 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import android.provider.Telephony.Mms.Rate;
 import android.util.Log;
 
