@@ -18,7 +18,7 @@ package com.android.mms.transaction;
 
 import android.content.Context;
 import android.net.NetworkUtilsHelper;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.MmsConfig;
 import com.klinker.android.send_message.Transaction;
@@ -157,7 +157,7 @@ public class TransactionSettings {
         mProxyAddress = proxyAddr;
         mProxyPort = proxyPort;
 
-        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, "TransactionSettings: " + mServiceCenter +
                     " proxyAddress: " + mProxyAddress +
                     " proxyPort: " + mProxyPort);

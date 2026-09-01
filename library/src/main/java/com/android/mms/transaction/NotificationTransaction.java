@@ -28,6 +28,7 @@ import android.provider.Telephony.Mms;
 import android.provider.Telephony.Mms.Inbox;
 import android.provider.Telephony.Threads;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.android.mms.logs.LogTag;
 import com.android.mms.MmsConfig;
@@ -41,7 +42,6 @@ import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
-import com.klinker.android.logger.Log;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Settings;
 

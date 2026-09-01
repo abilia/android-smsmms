@@ -1,11 +1,5 @@
 apply plugin: 'com.android.library'
 
-dependencies {
-    implementation 'com.klinkerapps:logger:1.0.3'
-    implementation 'com.squareup.okhttp:okhttp:2.7.5'
-    implementation 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
-}
-
 android {
     compileSdk 34
 
@@ -15,4 +9,9 @@ android {
     }
 
     namespace = 'com.klinker.android.send_message'
+}
+
+dependencies {
+    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+    implementation 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
 }

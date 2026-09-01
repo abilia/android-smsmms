@@ -39,6 +39,7 @@ import android.provider.Telephony.Threads;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.mms.service_alt.SubscriptionIdChecker;
 import com.google.android.mms.ContentType;
@@ -49,7 +50,6 @@ import com.google.android.mms.util_alt.DrmConvertSession;
 import com.google.android.mms.util_alt.PduCache;
 import com.google.android.mms.util_alt.PduCacheEntry;
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
 import com.klinker.android.send_message.Settings;
 
 import java.io.ByteArrayOutputStream;

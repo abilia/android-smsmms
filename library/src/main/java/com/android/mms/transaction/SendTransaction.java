@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.provider.Telephony.Mms;
 import android.provider.Telephony.Mms.Sent;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.mms.logs.LogTag;
 import com.android.mms.util.RateController;
@@ -36,7 +37,6 @@ import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.SendConf;
 import com.google.android.mms.pdu_alt.SendReq;
-import com.klinker.android.logger.Log;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Utils;
 
@@ -117,7 +117,7 @@ public class SendTransaction extends Transaction implements Runnable {
                                       new PduComposer(mContext, sendReq).make());
             SendingProgressTokenManager.remove(tokenKey);
 
-            if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
                 String respStr = new String(response);
                 builder.append("[SendTransaction] run: send mms msg (" + mId + "), resp=" + respStr);
                 Log.d(TAG, "[SendTransaction] run: send mms msg (" + mId + "), resp=" + respStr);

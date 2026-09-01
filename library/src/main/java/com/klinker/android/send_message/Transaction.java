@@ -33,6 +33,7 @@ import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.mms.MmsConfig;
@@ -56,7 +57,6 @@ import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.SendReq;
 import com.google.android.mms.smil.SmilHelper;
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

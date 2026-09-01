@@ -16,29 +16,26 @@
 
 package com.android.mms.transaction;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.android.mms.MmsConfig;
+import com.android.mms.logs.LogTag;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ResponseBody;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.telephony.TelephonyManager;
-import android.text.TextUtils;
-import com.klinker.android.logger.Log;
-
-import com.android.mms.logs.LogTag;
-import com.android.mms.MmsConfig;
-
 public class HttpUtils {
-    private static final String TAG = LogTag.TRANSACTION;
-
 
     public static final int HTTP_POST_METHOD = 1;
     public static final int HTTP_GET_METHOD = 2;
@@ -86,18 +83,16 @@ public class HttpUtils {
             throw new IllegalArgumentException("URL must not be null.");
         }
 
-        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-            Log.v(TAG, "httpConnection: params list");
-            Log.v(TAG, "\ttoken\t\t= " + token);
-            Log.v(TAG, "\turl\t\t= " + url);
-            Log.v(TAG, "\tmethod\t\t= "
+        if (Log.isLoggable(LogTag.TAG, Log.VERBOSE)) {
+            Log.v(LogTag.TAG, "httpConnection: params list");
+            Log.v(LogTag.TAG, "\ttoken\t\t= " + token);
+            Log.v(LogTag.TAG, "\turl\t\t= " + url);
+            Log.v(LogTag.TAG, "\tmethod\t\t= "
                     + ((method == HTTP_POST_METHOD) ? "POST"
                             : ((method == HTTP_GET_METHOD) ? "GET" : "UNKNOWN")));
-            Log.v(TAG, "\tisProxySet\t= " + isProxySet);
-            Log.v(TAG, "\tproxyHost\t= " + proxyHost);
-            Log.v(TAG, "\tproxyPort\t= " + proxyPort);
-            // TODO Print out binary data more readable.
-            //Log.v(TAG, "\tpdu\t\t= " + Arrays.toString(pdu));
+            Log.v(LogTag.TAG, "\tisProxySet\t= " + isProxySet);
+            Log.v(LogTag.TAG, "\tproxyHost\t= " + proxyHost);
+            Log.v(LogTag.TAG, "\tproxyPort\t= " + proxyPort);
         }
 
         try {
@@ -115,7 +110,7 @@ public class HttpUtils {
                     req.get();
                     break;
                 default:
-                    Log.e(TAG, "Unknown HTTP method: " + method
+                    Log.e(LogTag.TAG, "Unknown HTTP method: " + method
                             + ". Must be one of POST[" + HTTP_POST_METHOD
                             + "] or GET[" + HTTP_GET_METHOD + "].");
                     return null;
@@ -127,8 +122,8 @@ public class HttpUtils {
                 String xWapProfileTagName = MmsConfig.getUaProfTagName();
                 String xWapProfileUrl = MmsConfig.getUaProfUrl();
                 if (xWapProfileUrl != null) {
-                    if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                        Log.d(LogTag.TRANSACTION,
+                    if (Log.isLoggable(LogTag.TAG, Log.DEBUG)) {
+                        Log.d(LogTag.TAG,
                                 "[HttpUtils] httpConn: xWapProfUrl=" + xWapProfileUrl);
                     }
                     req.addHeader(xWapProfileTagName, xWapProfileUrl);
@@ -189,7 +184,7 @@ public class HttpUtils {
     private static void handleHttpConnectionException(Exception exception, String url)
             throws IOException {
         // Inner exception should be logged to make life easier.
-        Log.e(TAG, "Url: " + url + "\n" + exception.getMessage());
+        Log.e(LogTag.TAG, "Url: " + url + "\n" + exception.getMessage());
         throw new IOException(exception.getMessage(), exception);
     }
 
@@ -206,8 +201,8 @@ public class HttpUtils {
             client.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort)));
         }
 
-        if (Log.isLoggable(LogTag.TRANSACTION, Log.DEBUG)) {
-            Log.d(TAG, "[HttpUtils] createHttpClient w/ socket timeout " + soTimeout + " ms, "
+        if (Log.isLoggable(LogTag.TAG, Log.DEBUG)) {
+            Log.d(LogTag.TAG, "[HttpUtils] createHttpClient w/ socket timeout " + soTimeout + " ms, "
                     + ", UA=" + MmsConfig.getUserAgent());
         }
         return client;
