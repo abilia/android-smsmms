@@ -33,8 +33,11 @@ import com.squareup.okhttp.ConnectionPool;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
+public class MmsNetworkManager implements com.squareup.okhttp.Dns {
     private static final String TAG = "MmsNetworkManager";
     // Timeout used to call ConnectivityManager.requestNetwork
     private static final int NETWORK_REQUEST_TIMEOUT_MILLIS = 60 * 1000;
@@ -236,18 +239,16 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         mMmsHttpClient = null;
     }
 
-    private static final InetAddress[] EMPTY_ADDRESS_ARRAY = new InetAddress[0];
-
     @Override
-    public InetAddress[] resolveInetAddresses(String host) throws UnknownHostException {
+    public List<InetAddress> lookup(String hostname) throws UnknownHostException {
         Network network = null;
         synchronized (this) {
             if (mNetwork == null) {
-                return EMPTY_ADDRESS_ARRAY;
+                return Collections.emptyList();
             }
             network = mNetwork;
         }
-        return network.getAllByName(host);
+        return Arrays.asList(network.getAllByName(hostname));
     }
 
     private ConnectivityManager getConnectivityManager() {

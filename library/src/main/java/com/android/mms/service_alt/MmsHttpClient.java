@@ -27,7 +27,6 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Protocol;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.squareup.okhttp.internal.Internal;
 import com.squareup.okhttp.internal.huc.HttpURLConnectionImpl;
 import com.squareup.okhttp.internal.huc.HttpsURLConnectionImpl;
 
@@ -272,7 +271,7 @@ public class MmsHttpClient {
             okHttpClient.setConnectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT));
             okHttpClient.setConnectionPool(new ConnectionPool(3, 60000));
             okHttpClient.setSocketFactory(SocketFactory.getDefault());
-            Internal.instance.setNetwork(okHttpClient, mHostResolver);
+            okHttpClient.setDns(mHostResolver);
 
             if (proxy != null) {
                 okHttpClient.setProxy(proxy);
@@ -309,7 +308,7 @@ public class MmsHttpClient {
             });
             okHttpClient.setConnectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT));
             okHttpClient.setConnectionPool(new ConnectionPool(3, 60000));
-            Internal.instance.setNetwork(okHttpClient, mHostResolver);
+            okHttpClient.setDns(mHostResolver);
 
             return new HttpsURLConnectionImpl(url, okHttpClient);
         } else {
