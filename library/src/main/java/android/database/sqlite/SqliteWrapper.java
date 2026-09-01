@@ -25,31 +25,17 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 /**
  * @hide
  */
-
 public final class SqliteWrapper {
     private static final String TAG = "SqliteWrapper";
-    private static final String SQLITE_EXCEPTION_DETAIL_MESSAGE
-            = "unable to open database file";
+    private static final String SQLITE_EXCEPTION_DETAIL_MESSAGE = "unable to open database file";
 
     private SqliteWrapper() {
         // Forbidden being instantiated.
-    }
-
-    // FIXME: need to optimize this method.
-    private static boolean isLowMemory(SQLiteException e) {
-        return e.getMessage().equals(SQLITE_EXCEPTION_DETAIL_MESSAGE);
-    }
-
-    public static void checkSQLiteException(Context context, SQLiteException e) {
-        if (isLowMemory(e)) {
-            Toast.makeText(context, "Low Memory",
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            throw e;
-        }
     }
 
     public static Cursor query(Context context, ContentResolver resolver, Uri uri,
@@ -63,14 +49,14 @@ public final class SqliteWrapper {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    public static boolean requery(Context context, Cursor cursor) {
+    public static Uri insert(Context context, ContentResolver resolver,
+                             Uri uri, ContentValues values) {
         try {
-            return cursor.requery();
+            return resolver.insert(uri, values);
         } catch (SQLiteException e) {
-            Log.e(TAG, "Catch a SQLiteException when requery: ", e);
+            Log.e(TAG, "Catch a SQLiteException when insert: ", e);
             checkSQLiteException(context, e);
-            return false;
+            return null;
         }
     }
 
@@ -96,14 +82,12 @@ public final class SqliteWrapper {
         }
     }
 
-    public static Uri insert(Context context, ContentResolver resolver,
-                             Uri uri, ContentValues values) {
-        try {
-            return resolver.insert(uri, values);
-        } catch (SQLiteException e) {
-            Log.e(TAG, "Catch a SQLiteException when insert: ", e);
-            checkSQLiteException(context, e);
-            return null;
+    private static void checkSQLiteException(Context context, SQLiteException e) {
+        if (Objects.equals(e.getMessage(), SQLITE_EXCEPTION_DETAIL_MESSAGE)) {
+            Toast.makeText(context, "Low Memory", Toast.LENGTH_SHORT).show();
+        } else {
+            throw e;
         }
     }
+
 }
