@@ -425,6 +425,7 @@ public class Transaction {
         }
     }
 
+    @SuppressLint("Range")
     public static MessageInfo getBytes(Context context, boolean saveMessage, String fromAddress,
                                        String[] recipients, MMSPart[] parts, String subject)
                 throws MmsException {

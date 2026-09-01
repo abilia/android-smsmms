@@ -16,6 +16,7 @@
 
 package com.android.mms.transaction;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
@@ -63,7 +64,7 @@ public class RetryScheduler implements Observer {
     private boolean isConnected() {
         ConnectivityManager mConnMgr = (ConnectivityManager)
                 mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
+        @SuppressLint("MissingPermission") NetworkInfo ni = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
         return (ni == null ? false : ni.isConnected());
     }
 
@@ -244,7 +245,7 @@ public class RetryScheduler implements Observer {
 
         try {
             query.moveToFirst();
-            String id = query.getString(query.getColumnIndex(Mms._ID));
+            @SuppressLint("Range") String id = query.getString(query.getColumnIndex(Mms._ID));
             query.close();
 
             // mark message as failed

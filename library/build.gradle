@@ -14,10 +14,6 @@ android {
         targetSdkVersion 34
     }
 
-    lintOptions {
-        abortOnError false
-    }
-
     useLibrary 'org.apache.http.legacy'
 
     namespace = 'com.klinker.android.send_message'

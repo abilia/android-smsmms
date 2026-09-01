@@ -16,6 +16,7 @@
 
 package com.android.mms.service_alt;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
@@ -344,6 +345,7 @@ public class DownloadRequest extends MmsRequest {
         throw new MmsException("Cannot get X-Mms-Content-Location from: " + uri);
     }
 
+    @SuppressLint("Range")
     private static Long getId(Context context, String location) {
         String selection = Telephony.Mms.CONTENT_LOCATION + " = ?";
         String[] selectionArgs = new String[] { location };

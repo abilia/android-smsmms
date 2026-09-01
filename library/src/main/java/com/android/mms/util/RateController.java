@@ -16,6 +16,7 @@
 
 package com.android.mms.util;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -117,6 +118,7 @@ public class RateController {
         return false;
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     synchronized public boolean isAllowedByUser() {
         while (sMutexLock) {
             try {
