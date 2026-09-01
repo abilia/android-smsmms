@@ -45,7 +45,6 @@ import com.android.mms.service_alt.SubscriptionIdChecker;
 import com.google.android.mms.ContentType;
 import com.google.android.mms.InvalidHeaderValueException;
 import com.google.android.mms.MmsException;
-import com.google.android.mms.util_alt.DownloadDrmHelper;
 import com.google.android.mms.util_alt.DrmConvertSession;
 import com.google.android.mms.util_alt.PduCache;
 import com.google.android.mms.util_alt.PduCacheEntry;
@@ -80,12 +79,9 @@ public class PduPersister {
      */
     public static final String TEMPORARY_DRM_OBJECT_URI =
         "content://mms/" + Long.MAX_VALUE + "/part";
-    /**
-     * Indicate that we transiently failed to process a MM.
-     */
-    public static final int PROC_STATUS_TRANSIENT_FAILURE   = 1;
 
-
+    /** The MIME type of special DRM files */
+    public static final String MIMETYPE_DRM_MESSAGE = "application/vnd.oma.drm.message";
 
     private static PduPersister sPersister;
     private static final PduCache PDU_CACHE_INSTANCE;
@@ -691,7 +687,7 @@ public class PduPersister {
         }
     }
 
-    private static String getPartContentType(PduPart part) {
+    private String getPartContentType(PduPart part) {
         return part.getContentType() == null ? null : toIsoString(part.getContentType());
     }
 
@@ -761,7 +757,7 @@ public class PduPersister {
         return res;
     }
 
-    private static String cutString(String src, int expectSize) {
+    private String cutString(String src, int expectSize) {
         if (src.length() == 0) {
             return "";
         }
@@ -786,6 +782,16 @@ public class PduPersister {
             }
         }
         return builder.toString();
+    }
+
+    /**
+     * Checks if the Media Type needs to be DRM converted
+     *
+     * @param mimetype Media type of the content
+     * @return True if convert is needed else false
+     */
+    private boolean isDrmConvertNeeded(String mimetype) {
+        return MIMETYPE_DRM_MESSAGE.equals(mimetype);
     }
 
     /**
@@ -834,7 +840,7 @@ public class PduPersister {
                     }
                 }
             } else {
-                boolean isDrm = DownloadDrmHelper.isDrmConvertNeeded(contentType);
+                boolean isDrm = isDrmConvertNeeded(contentType);
                 if (isDrm) {
                     if (uri != null) {
                         try {
