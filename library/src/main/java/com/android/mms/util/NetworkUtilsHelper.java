@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package com.android.mms;
+package com.android.mms.util;
 
-
-/**
- * Native methods for managing network interfaces.
- * <p/>
- * {@hide}
- */
 public class NetworkUtilsHelper {
 
     /**
