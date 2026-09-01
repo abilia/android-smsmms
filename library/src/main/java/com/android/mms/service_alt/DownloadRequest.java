@@ -82,7 +82,7 @@ public class DownloadRequest extends MmsRequest {
         final MmsHttpClient mmsHttpClient = netMgr.getOrCreateHttpClient();
         if (mmsHttpClient == null) {
             Log.e(TAG, "MMS network is not ready!");
-            throw new MmsHttpException(0/*statusCode*/, "MMS network is not ready");
+            throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, "MMS network is not ready");
         }
         return mmsHttpClient.execute(
                 mLocationUrl,

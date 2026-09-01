@@ -155,7 +155,7 @@ public class MmsHttpClient {
             if (METHOD_POST.equals(method)) {
                 if (pdu == null || pdu.length < 1) {
                     Log.e(TAG, "HTTP: empty pdu");
-                    throw new MmsHttpException(0/*statusCode*/, "Sending empty PDU");
+                    throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, "Sending empty PDU");
                 }
                 connection.setDoOutput(true);
                 connection.setRequestMethod(METHOD_POST);
@@ -207,14 +207,14 @@ public class MmsHttpClient {
         } catch (MalformedURLException e) {
             final String redactedUrl = redactUrlForNonVerbose(urlString);
             Log.e(TAG, "HTTP: invalid URL " + redactedUrl, e);
-            throw new MmsHttpException(0/*statusCode*/, "Invalid URL " + redactedUrl, e);
+            throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, "Invalid URL " + redactedUrl, e);
         } catch (ProtocolException e) {
             final String redactedUrl = redactUrlForNonVerbose(urlString);
             Log.e(TAG, "HTTP: invalid URL protocol " + redactedUrl, e);
-            throw new MmsHttpException(0/*statusCode*/, "Invalid URL protocol " + redactedUrl, e);
+            throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, "Invalid URL protocol " + redactedUrl, e);
         } catch (IOException e) {
             Log.e(TAG, "HTTP: IO failure", e);
-            throw new MmsHttpException(0/*statusCode*/, e);
+            throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -334,7 +334,7 @@ public class MmsHttpClient {
 
     private static void checkMethod(String method) throws MmsHttpException {
         if (!METHOD_GET.equals(method) && !METHOD_POST.equals(method)) {
-            throw new MmsHttpException(0/*statusCode*/, "Invalid method " + method);
+            throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, "Invalid method " + method);
         }
     }
 
