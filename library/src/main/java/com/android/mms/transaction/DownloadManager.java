@@ -15,9 +15,9 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.mms.MmsConfig;
-import com.klinker.android.logger.Log;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.MmsReceivedReceiver;
 import com.klinker.android.send_message.SmsManagerFactory;

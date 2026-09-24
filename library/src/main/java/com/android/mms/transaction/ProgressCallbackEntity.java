@@ -21,13 +21,14 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.klinker.android.send_message.BroadcastUtils;
-
-import org.apache.http.entity.ByteArrayEntity;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.RequestBody;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
-public class ProgressCallbackEntity extends ByteArrayEntity {
+import okio.BufferedSink;
+
+public class ProgressCallbackEntity extends RequestBody {
     private static final int DEFAULT_PIECE_SIZE = 4096;
 
     public static final String PROGRESS_STATUS_ACTION = "com.android.mms.PROGRESS_STATUS";
@@ -38,19 +39,32 @@ public class ProgressCallbackEntity extends ByteArrayEntity {
     private final Context mContext;
     private final byte[] mContent;
     private final long mToken;
+    private MediaType mContentType;
 
     public ProgressCallbackEntity(Context context, long token, byte[] b) {
-        super(b);
-
         mContext = context;
         mContent = b;
         mToken = token;
     }
 
+    public void setContentType(String contentType) {
+        mContentType = MediaType.parse(contentType);
+    }
+
     @Override
-    public void writeTo(final OutputStream outstream) throws IOException {
-        if (outstream == null) {
-            throw new IllegalArgumentException("Output stream may not be null");
+    public MediaType contentType() {
+        return mContentType;
+    }
+
+    @Override
+    public long contentLength() {
+        return mContent.length;
+    }
+
+    @Override
+    public void writeTo(final BufferedSink sink) throws IOException {
+        if (sink == null) {
+            throw new IllegalArgumentException("Sink may not be null");
         }
 
         boolean completed = false;
@@ -63,8 +77,8 @@ public class ProgressCallbackEntity extends ByteArrayEntity {
                 if (len > DEFAULT_PIECE_SIZE) {
                     len = DEFAULT_PIECE_SIZE;
                 }
-                outstream.write(mContent, pos, len);
-                outstream.flush();
+                sink.write(mContent, pos, len);
+                sink.flush();
 
                 pos += len;
 

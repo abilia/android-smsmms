@@ -28,7 +28,7 @@ import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import com.klinker.android.send_message.Settings;
 
 public class MmsRequestManager implements MmsRequest.RequestManager {
@@ -109,7 +109,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
             // Don't mark the transaction as failed if we failed to send it.
             // sendAcknowledgeInd(retrieveConf);
         } catch (Throwable t) {
-            com.klinker.android.logger.Log.e(TAG, "error", t);
+            Log.e(TAG, "error", t);
         }
 
         return false;

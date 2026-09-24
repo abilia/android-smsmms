@@ -16,6 +16,7 @@
 
 package com.android.mms.service_alt;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -24,13 +25,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.service.carrier.CarrierMessagingService;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
-import com.klinker.android.logger.Log;
+import android.util.Log;
+
 import com.klinker.android.send_message.Utils;
 
 import com.android.mms.service_alt.exception.ApnException;
@@ -105,13 +106,8 @@ public abstract class MmsRequest {
 
     private boolean ensureMmsConfigLoaded() {
         if (mMmsConfig == null) {
-            final MmsConfig config;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                // Not yet retrieved from mms config manager. Try getting it.
-                config = MmsConfigManager.getInstance().getMmsConfigBySubId(mSubId);
-            } else {
-                config = MmsConfigManager.getInstance().getMmsConfig();
-            }
+            // Not yet retrieved from mms config manager. Try getting it.
+            final MmsConfig config = MmsConfigManager.getInstance().getMmsConfigBySubId(mSubId);
 
             if (config != null) {
                 mMmsConfig = new MmsConfig.Overridden(config, mMmsConfigOverrides);
@@ -169,11 +165,7 @@ public abstract class MmsRequest {
             result = SmsManager.MMS_ERROR_IO_ERROR;
         } else if (!isDataNetworkAvailable(context, mSubId)) {
             Log.e(TAG, "MmsRequest: in airplane mode or mobile data disabled");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                result = SmsManager.MMS_ERROR_NO_DATA_NETWORK;
-            } else {
-                result = 8;
-            }
+            result = SmsManager.MMS_ERROR_NO_DATA_NETWORK;
         } else { // Execute
             long retryDelaySecs = 2;
             // Try multiple times of MMS HTTP request
@@ -270,11 +262,7 @@ public abstract class MmsRequest {
                 fillIn.putExtra("uri", messageUri.toString());
             }
             if (result == SmsManager.MMS_ERROR_HTTP_FAILURE && httpStatusCode != 0) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                    fillIn.putExtra(SmsManager.EXTRA_MMS_HTTP_STATUS, httpStatusCode);
-                } else {
-                    fillIn.putExtra("android.telephony.extra.MMS_HTTP_STATUS", httpStatusCode);
-                }
+                fillIn.putExtra(SmsManager.EXTRA_MMS_HTTP_STATUS, httpStatusCode);
             }
             try {
                 if (!succeeded) {
@@ -296,7 +284,7 @@ public abstract class MmsRequest {
         if (Utils.isMmsOverWifiEnabled(context)) {
             ConnectivityManager mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (mConnMgr != null) {
-                NetworkInfo niWF = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                @SuppressLint("MissingPermission") NetworkInfo niWF = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 if ((niWF != null) && (niWF.isConnected())) {
                     return true;
                 }
@@ -322,19 +310,7 @@ public abstract class MmsRequest {
         }
     }
 
-    /**
-     * Converts from {@code carrierMessagingAppResult} to a platform result code.
-     */
-    protected static int toSmsManagerResult(int carrierMessagingAppResult) {
-        switch (carrierMessagingAppResult) {
-            case CarrierMessagingService.SEND_STATUS_OK:
-                return Activity.RESULT_OK;
-            case CarrierMessagingService.SEND_STATUS_RETRY_ON_CARRIER_NETWORK:
-                return SmsManager.MMS_ERROR_RETRY;
-            default:
-                return SmsManager.MMS_ERROR_UNSPECIFIED;
-        }
-    }
+
 
     /**
      * Making the HTTP request to MMSC

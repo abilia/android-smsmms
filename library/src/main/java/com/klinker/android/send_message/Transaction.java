@@ -19,11 +19,13 @@ package com.klinker.android.send_message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Parcelable;
@@ -31,22 +33,30 @@ import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.android.mms.MmsConfig;
+import com.android.mms.dom.smil.parser.SmilXmlSerializer;
 import com.android.mms.service_alt.MmsNetworkManager;
 import com.android.mms.service_alt.MmsRequestManager;
 import com.android.mms.service_alt.SendRequest;
-import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
-import android.widget.Toast;
-import com.android.mms.dom.smil.parser.SmilXmlSerializer;
-import com.android.mms.transaction.MmsMessageSender;
-import com.android.mms.transaction.ProgressCallbackEntity;
 import com.android.mms.util.DownloadManager;
 import com.android.mms.util.RateController;
-import com.google.android.mms.*;
-import com.google.android.mms.pdu_alt.*;
+import com.google.android.mms.ContentType;
+import com.google.android.mms.InvalidHeaderValueException;
+import com.google.android.mms.MMSPart;
+import com.google.android.mms.MmsException;
+import com.google.android.mms.pdu_alt.CharacterSets;
+import com.google.android.mms.pdu_alt.EncodedStringValue;
+import com.google.android.mms.pdu_alt.PduBody;
+import com.google.android.mms.pdu_alt.PduComposer;
+import com.google.android.mms.pdu_alt.PduHeaders;
+import com.google.android.mms.pdu_alt.PduPart;
+import com.google.android.mms.pdu_alt.PduPersister;
+import com.google.android.mms.pdu_alt.SendReq;
 import com.google.android.mms.smil.SmilHelper;
+import com.android.mms.SqliteWrapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -54,7 +64,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Class to process transaction requests for sending
@@ -67,10 +83,6 @@ public class Transaction {
     public static Settings settings;
     private Context context;
 
-    private Intent explicitSentSmsReceiver;
-    private Intent explicitSentMmsReceiver;
-    private Intent explicitDeliveredSmsReceiver;
-
     private boolean saveMessage = true;
 
     public String SMS_SENT = ".SMS_SENT";
@@ -81,20 +93,9 @@ public class Transaction {
     public static String NOTIFY_SMS_FAILURE = ".NOTIFY_SMS_FAILURE";
     public static final String MMS_ERROR = "com.klinker.android.send_message.MMS_ERROR";
     public static final String REFRESH = "com.klinker.android.send_message.REFRESH";
-    public static final String MMS_PROGRESS = "com.klinker.android.send_message.MMS_PROGRESS";
-    public static final String NOTIFY_OF_DELIVERY = "com.klinker.android.send_message.NOTIFY_DELIVERY";
     public static final String NOTIFY_OF_MMS = "com.klinker.android.messaging.NEW_MMS_DOWNLOADED";
 
     public static final long NO_THREAD_ID = 0;
-
-    /**
-     * Sets context and initializes settings to default values
-     *
-     * @param context is the context of the activity or service
-     */
-    public Transaction(Context context) {
-        this(context, new Settings());
-    }
 
     /**
      * Sets context and settings
@@ -173,45 +174,6 @@ public class Transaction {
         this.sendNewMessage(message, threadId, new Bundle(), new Bundle());
     }
 
-    /**
-     * Optional: define a {@link BroadcastReceiver} that will get started when Android notifies us that the SMS has
-     * been marked as "sent". If you do not define a receiver here, it will look for the .SMS_SENT receiver
-     * that was defined in the AndroidManifest, as discussed in the README.md.
-     *
-     * @param intent the receiver that you want to start when the message gets marked as sent.
-     */
-    public Transaction setExplicitBroadcastForSentSms(Intent intent) {
-        explicitSentSmsReceiver = intent;
-        return this;
-    }
-
-    /**
-     * Optional: define a {@link BroadcastReceiver} that will get started when Android notifies us that the MMS has
-     * been marked as "sent". If you do not define a receiver here, it will look for the .MMS_SENT receiver
-     * that was defined in the AndroidManifest, as discussed in the README.md.
-     *
-     * @param intent the receiver that you want to start when the message gets marked as sent.
-     */
-    public Transaction setExplicitBroadcastForSentMms(Intent intent) {
-        explicitSentMmsReceiver = intent;
-        return this;
-    }
-
-    /**
-     * Optional: define a {@link BroadcastReceiver} that will get started when Android notifies us that the SMS has
-     * been marked as "delivered". If you do not define a receiver here, it will look for the .SMS_DELIVERED
-     * receiver that was defined in the AndroidManifest, as discussed in the README.md.
-     * <p/>
-     * Providing a receiver here does not guarantee that it will ever get started. If the {@link Settings}
-     * object does not have delivery reports turned on, this receiver will never get called.
-     *
-     * @param intent the receiver that you want to start when the message gets marked as sent.
-     */
-    public Transaction setExplicitBroadcastForDeliveredSms(Intent intent) {
-        explicitDeliveredSmsReceiver = intent;
-        return this;
-    }
-
     private void sendSmsMessage(String text, String[] addresses, long threadId, int delay,
                                 Parcelable sentMessageParcelable, Parcelable deliveredParcelable) {
         Log.v("send_transaction", "message text: " + text);
@@ -257,13 +219,8 @@ public class Transaction {
                 Log.v("send_transaction", "message id: " + messageId);
 
                 // set up sent and delivered pending intents to be used with message request
-                Intent sentIntent;
-                if (explicitSentSmsReceiver == null) {
-                    sentIntent = new Intent(SMS_SENT);
-                    BroadcastUtils.addClassName(context, sentIntent, SMS_SENT);
-                } else {
-                    sentIntent = explicitSentSmsReceiver;
-                }
+                Intent sentIntent = new Intent(SMS_SENT);
+                BroadcastUtils.addClassName(context, sentIntent, SMS_SENT);
 
                 sentIntent.putExtra("message_uri", messageUri == null ? "" : messageUri.toString());
                 sentIntent.putExtra(SENT_SMS_BUNDLE, sentMessageParcelable);
@@ -271,13 +228,8 @@ public class Transaction {
                 PendingIntent sentPI = PendingIntent.getBroadcast(
                         context, messageId, sentIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
-                Intent deliveredIntent;
-                if (explicitDeliveredSmsReceiver == null) {
-                    deliveredIntent = new Intent(SMS_DELIVERED);
-                    BroadcastUtils.addClassName(context, deliveredIntent, SMS_DELIVERED);
-                } else {
-                    deliveredIntent = explicitDeliveredSmsReceiver;
-                }
+                Intent deliveredIntent = new Intent(SMS_DELIVERED);
+                BroadcastUtils.addClassName(context, deliveredIntent, SMS_DELIVERED);
 
                 deliveredIntent.putExtra("message_uri", messageUri == null ? "" : messageUri.toString());
                 deliveredIntent.putExtra(DELIVERED_SMS_BUNDLE, deliveredParcelable);
@@ -455,74 +407,25 @@ public class Transaction {
             data.add(part);
         }
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-            MessageInfo info = null;
-
-            try {
-                info = getBytes(context, saveMessage, fromAddress, address.split(" "),
-                        data.toArray(new MMSPart[data.size()]), subject);
-                MmsMessageSender sender = new MmsMessageSender(context, info.location, info.bytes.length);
-                sender.sendMessage(info.token);
-
-                IntentFilter filter = new IntentFilter();
-                filter.addAction(ProgressCallbackEntity.PROGRESS_STATUS_ACTION);
-                BroadcastReceiver receiver = new BroadcastReceiver() {
-
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        int progress = intent.getIntExtra("progress", -3);
-                        Log.v("sending_mms_library", "progress: " + progress);
-
-                        // send progress broadcast to update ui if desired...
-                        Intent progressIntent = new Intent(MMS_PROGRESS);
-                        progressIntent.putExtra("progress", progress);
-                        BroadcastUtils.sendExplicitBroadcast(context, progressIntent, MMS_PROGRESS);
-
-                        if (progress == ProgressCallbackEntity.PROGRESS_COMPLETE) {
-                            BroadcastUtils.sendExplicitBroadcast(context, new Intent(), REFRESH);
-
-                            try {
-                                context.unregisterReceiver(this);
-                            } catch (Exception e) {
-                                // TODO fix me
-                                // receiver is not registered force close error... hmm.
-                            }
-                        } else if (progress == ProgressCallbackEntity.PROGRESS_ABORT) {
-                            // This seems to get called only after the progress has reached 100 and
-                            // then something else goes wrong, so here we will try and send again
-                            // and see if it works
-                            Log.v("sending_mms_library", "sending aborted for some reason...");
-                        }
-                    }
-
-                };
-
-                context.registerReceiver(receiver, filter);
-            } catch (Throwable e) {
-                Log.e(TAG, "exception thrown", e);
-            }
+        if (settings.getUseSystemSending()) {
+            Log.v(TAG, "using system method for sending");
+            sendMmsThroughSystem(context, subject, data, fromAddress, addresses, save, messageUri);
         } else {
-            Log.v(TAG, "using lollipop method for sending sms");
-
-            if (settings.getUseSystemSending()) {
-                Log.v(TAG, "using system method for sending");
-                sendMmsThroughSystem(context, subject, data, fromAddress, addresses, explicitSentMmsReceiver, save, messageUri);
-            } else {
-                try {
-                    MessageInfo info = getBytes(context, saveMessage, fromAddress, address.split(" "),
-                            data.toArray(new MMSPart[data.size()]), subject);
-                    MmsRequestManager requestManager = new MmsRequestManager(context, info.bytes);
-                    SendRequest request = new SendRequest(requestManager, Utils.getDefaultSubscriptionId(),
-                            info.location, null, null, null, null);
-                    MmsNetworkManager manager = new MmsNetworkManager(context, Utils.getDefaultSubscriptionId());
-                    request.execute(context, manager);
-                } catch (Exception e) {
-                    Log.e(TAG, "error sending mms", e);
-                }
+            try {
+                MessageInfo info = getBytes(context, saveMessage, fromAddress, address.split(" "),
+                        data.toArray(new MMSPart[data.size()]), subject);
+                MmsRequestManager requestManager = new MmsRequestManager(context, info.bytes);
+                SendRequest request = new SendRequest(requestManager, Utils.getDefaultSubscriptionId(),
+                        info.location, null, null, null, null);
+                MmsNetworkManager manager = new MmsNetworkManager(context, Utils.getDefaultSubscriptionId());
+                request.execute(context, manager);
+            } catch (Exception e) {
+                Log.e(TAG, "error sending mms", e);
             }
         }
     }
 
+    @SuppressLint("Range")
     public static MessageInfo getBytes(Context context, boolean saveMessage, String fromAddress,
                                        String[] recipients, MMSPart[] parts, String subject)
                 throws MmsException {
@@ -649,7 +552,7 @@ public class Transaction {
     public static final int DEFAULT_PRIORITY = PduHeaders.PRIORITY_NORMAL;
 
     private static void sendMmsThroughSystem(Context context, String subject, List<MMSPart> parts, String fromAddress,
-                                             String[] addresses, Intent explicitSentMmsReceiver, boolean save, Uri existingMessageUri) {
+                                             String[] addresses, boolean save, Uri existingMessageUri) {
         try {
             final String fileName = "send." + String.valueOf(Math.abs(new Random().nextLong())) + ".dat";
             File mSendFile = new File(context.getCacheDir(), fileName);
@@ -673,13 +576,8 @@ public class Transaction {
                 Log.v(TAG, "rowsUpdated=" + rowsUpdated);
             }
 
-            Intent intent;
-            if (explicitSentMmsReceiver == null) {
-                intent = new Intent(MmsSentReceiver.MMS_SENT);
-                BroadcastUtils.addClassName(context, intent, MmsSentReceiver.MMS_SENT);
-            } else {
-                intent = explicitSentMmsReceiver;
-            }
+            Intent intent = new Intent(MmsSentReceiver.MMS_SENT);
+            BroadcastUtils.addClassName(context, intent, MmsSentReceiver.MMS_SENT);
 
             intent.putExtra(MmsSentReceiver.EXTRA_CONTENT_URI, messageUri.toString());
             intent.putExtra(MmsSentReceiver.EXTRA_FILE_PATH, mSendFile.getPath());

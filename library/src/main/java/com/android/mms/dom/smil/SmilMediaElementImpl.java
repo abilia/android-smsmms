@@ -16,17 +16,17 @@
 
 package com.android.mms.dom.smil;
 
+import android.util.Log;
+
+import com.android.mms.dom.events.EventImpl;
+import com.android.mms.LogTag;
+
 import org.w3c.dom.DOMException;
 import org.w3c.dom.events.DocumentEvent;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.smil.ElementTime;
 import org.w3c.dom.smil.SMILMediaElement;
 import org.w3c.dom.smil.TimeList;
-
-import com.klinker.android.logger.Log;
-
-import com.android.mms.logs.LogTag;
-import com.android.mms.dom.events.EventImpl;
 
 public class SmilMediaElementImpl extends SmilElementImpl implements
         SMILMediaElement {
@@ -35,7 +35,6 @@ public class SmilMediaElementImpl extends SmilElementImpl implements
     public final static String SMIL_MEDIA_PAUSE_EVENT = "SmilMediaPause";
     public final static String SMIL_MEDIA_SEEK_EVENT = "SmilMediaSeek";
     private final static String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     ElementTime mElementTime = new ElementTimeImpl(this) {

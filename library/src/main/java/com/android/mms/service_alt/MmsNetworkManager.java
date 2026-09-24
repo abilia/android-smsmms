@@ -16,6 +16,7 @@
 
 package com.android.mms.service_alt;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -23,18 +24,19 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.NetworkInfo;
 import android.net.SSLCertificateSocketFactory;
-import android.os.Build;
 import android.os.SystemClock;
-
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.service_alt.exception.MmsNetworkException;
 import com.squareup.okhttp.ConnectionPool;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
+public class MmsNetworkManager implements com.squareup.okhttp.Dns {
     private static final String TAG = "MmsNetworkManager";
     // Timeout used to call ConnectivityManager.requestNetwork
     private static final int NETWORK_REQUEST_TIMEOUT_MILLIS = 60 * 1000;
@@ -89,18 +91,11 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         mSubId = subId;
 
         if (!MmsRequest.useWifi(context)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                mNetworkRequest = new NetworkRequest.Builder()
-                        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
-                        .setNetworkSpecifier(Integer.toString(mSubId))
-                        .build();
-            } else {
-                mNetworkRequest = new NetworkRequest.Builder()
-                        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
-                        .build();
-            }
+            mNetworkRequest = new NetworkRequest.Builder()
+                    .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
+                    .setNetworkSpecifier(Integer.toString(mSubId))
+                    .build();
         } else {
             mNetworkRequest = new NetworkRequest.Builder()
                     .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -243,18 +238,16 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         mMmsHttpClient = null;
     }
 
-    private static final InetAddress[] EMPTY_ADDRESS_ARRAY = new InetAddress[0];
-
     @Override
-    public InetAddress[] resolveInetAddresses(String host) throws UnknownHostException {
+    public List<InetAddress> lookup(String hostname) throws UnknownHostException {
         Network network = null;
         synchronized (this) {
             if (mNetwork == null) {
-                return EMPTY_ADDRESS_ARRAY;
+                return Collections.emptyList();
             }
             network = mNetwork;
         }
-        return network.getAllByName(host);
+        return Arrays.asList(network.getAllByName(hostname));
     }
 
     private ConnectivityManager getConnectivityManager() {
@@ -318,7 +311,7 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         }
         String apnName = null;
         final ConnectivityManager connectivityManager = getConnectivityManager();
-        NetworkInfo mmsNetworkInfo = connectivityManager.getNetworkInfo(network);
+        @SuppressLint("MissingPermission") NetworkInfo mmsNetworkInfo = connectivityManager.getNetworkInfo(network);
         if (mmsNetworkInfo != null) {
             apnName = mmsNetworkInfo.getExtraInfo();
         }

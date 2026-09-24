@@ -23,23 +23,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.service_alt.exception.MmsHttpException;
-
-import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.GenericPdu;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.SendConf;
 import com.google.android.mms.pdu_alt.SendReq;
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 
 /**
  * Request to send an MMS
@@ -67,7 +64,7 @@ public class SendRequest extends MmsRequest {
         final MmsHttpClient mmsHttpClient = netMgr.getOrCreateHttpClient();
         if (mmsHttpClient == null) {
             Log.e(TAG, "MMS network is not ready!");
-            throw new MmsHttpException(0/*statusCode*/, "MMS network is not ready");
+            throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, "MMS network is not ready");
         }
         return mmsHttpClient.execute(
                 mLocationUrl != null ? mLocationUrl : apn.getMmscUrl(),

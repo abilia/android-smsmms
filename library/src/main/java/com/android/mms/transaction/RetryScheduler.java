@@ -16,6 +16,7 @@
 
 package com.android.mms.transaction;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
@@ -24,25 +25,24 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.Telephony.Mms;
 import android.provider.Telephony.MmsSms;
 import android.provider.Telephony.MmsSms.PendingMessages;
+import android.util.Log;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 import com.android.mms.util.DownloadManager;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduPersister;
-import com.klinker.android.logger.Log;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.R;
 
 public class RetryScheduler implements Observer {
     private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     private final Context mContext;
@@ -64,7 +64,7 @@ public class RetryScheduler implements Observer {
     private boolean isConnected() {
         ConnectivityManager mConnMgr = (ConnectivityManager)
                 mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
+        @SuppressLint("MissingPermission") NetworkInfo ni = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
         return (ni == null ? false : ni.isConnected());
     }
 
@@ -72,7 +72,7 @@ public class RetryScheduler implements Observer {
         try {
             Transaction t = (Transaction) observable;
 
-            if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "[RetryScheduler] update " + observable);
             }
 
@@ -173,7 +173,7 @@ public class RetryScheduler implements Observer {
                     if ((retryIndex < scheme.getRetryLimit()) && retry) {
                         long retryAt = current + scheme.getWaitingInterval();
 
-                        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+                        if (Log.isLoggable(TAG, Log.VERBOSE)) {
                             Log.v(TAG, "scheduleRetry: retry for " + uri + " is scheduled at "
                                     + (retryAt - System.currentTimeMillis()) + "ms from now");
                         }
@@ -245,7 +245,7 @@ public class RetryScheduler implements Observer {
 
         try {
             query.moveToFirst();
-            String id = query.getString(query.getColumnIndex(Mms._ID));
+            @SuppressLint("Range") String id = query.getString(query.getColumnIndex(Mms._ID));
             query.close();
 
             // mark message as failed
@@ -299,7 +299,7 @@ public class RetryScheduler implements Observer {
             cursor.close();
         }
         if (retrieveStatus != 0) {
-            if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "Retrieve status is: " + retrieveStatus);
             }
         }
@@ -324,7 +324,7 @@ public class RetryScheduler implements Observer {
                             Context.ALARM_SERVICE);
                     am.set(AlarmManager.RTC, retryAt, operation);
 
-                    if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+                    if (Log.isLoggable(TAG, Log.VERBOSE)) {
                         Log.v(TAG, "Next retry is scheduled at"
                                 + (retryAt - System.currentTimeMillis()) + "ms from now");
                     }

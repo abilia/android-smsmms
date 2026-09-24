@@ -19,13 +19,13 @@ package com.android.mms.service_alt;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
-import android.net.NetworkUtilsHelper;
+import com.android.mms.SqliteWrapper;
+import com.android.mms.util.NetworkUtilsHelper;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Telephony;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.service_alt.exception.ApnException;
 
@@ -70,19 +70,6 @@ public class ApnSettings {
     private static final int COLUMN_MMSC         = 1;
     private static final int COLUMN_MMSPROXY     = 2;
     private static final int COLUMN_MMSPORT      = 3;
-    private static final int COLUMN_NAME         = 4;
-    private static final int COLUMN_APN          = 5;
-    private static final int COLUMN_BEARER       = 6;
-    private static final int COLUMN_PROTOCOL     = 7;
-    private static final int COLUMN_ROAMING_PROTOCOL = 8;
-    private static final int COLUMN_AUTH_TYPE    = 9;
-    private static final int COLUMN_MVNO_TYPE    = 10;
-    private static final int COLUMN_MVNO_MATCH_DATA = 11;
-    private static final int COLUMN_PROXY        = 12;
-    private static final int COLUMN_PORT         = 13;
-    private static final int COLUMN_SERVER       = 14;
-    private static final int COLUMN_USER         = 15;
-    private static final int COLUMN_PASSWORD     = 16;
 
 
     /**

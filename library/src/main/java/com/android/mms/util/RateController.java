@@ -16,21 +16,21 @@
 
 package com.android.mms.util;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import android.provider.Telephony.Mms.Rate;
+import android.util.Log;
 
-import com.android.mms.logs.LogTag;
-import com.klinker.android.logger.Log;
+import com.android.mms.LogTag;
 
 public class RateController {
     private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     private static final int RATE_LIMIT = 100;
@@ -118,6 +118,7 @@ public class RateController {
         return false;
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     synchronized public boolean isAllowedByUser() {
         while (sMutexLock) {
             try {

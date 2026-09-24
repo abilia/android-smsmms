@@ -20,18 +20,18 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Telephony.Mms;
 
-import com.android.mms.logs.LogTag;
-import com.klinker.android.logger.Log;
+import com.android.mms.LogTag;
+
+import android.util.Log;
 import android.widget.Toast;
 
-import com.android.internal.telephony.TelephonyProperties;
 import com.android.mms.service_alt.SystemPropertiesProxy;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.EncodedStringValue;
@@ -41,12 +41,10 @@ import com.klinker.android.send_message.R;
 
 public class DownloadManager {
     private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     public static final int DEFERRED_MASK           = 0x04;
 
-    public static final int STATE_UNKNOWN           = 0x00;
     public static final int STATE_UNSTARTED         = 0x80;
     public static final int STATE_DOWNLOADING       = 0x81;
     public static final int STATE_TRANSIENT_FAILURE = 0x82;
@@ -121,9 +119,7 @@ public class DownloadManager {
     }
 
     static boolean isRoaming(Context context) {
-        // TODO: fix and put in Telephony layer
-        String roaming = SystemPropertiesProxy.get(context,
-                TelephonyProperties.PROPERTY_OPERATOR_ISROAMING, null);
+        String roaming = SystemPropertiesProxy.get(context, "gsm.operator.isroaming", null);
         if (LOCAL_LOGV) {
             Log.v(TAG, "roaming ------> " + roaming);
         }

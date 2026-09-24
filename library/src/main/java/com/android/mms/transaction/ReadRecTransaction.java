@@ -21,9 +21,9 @@ import java.io.IOException;
 import android.content.Context;
 import android.net.Uri;
 import android.provider.Telephony.Mms.Sent;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.EncodedStringValue;
 import com.google.android.mms.pdu_alt.PduComposer;
@@ -44,7 +44,6 @@ import com.klinker.android.send_message.Utils;
  */
 public class ReadRecTransaction extends Transaction implements Runnable{
     private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     private Thread mThread;

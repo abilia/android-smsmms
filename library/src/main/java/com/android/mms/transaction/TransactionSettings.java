@@ -17,16 +17,14 @@
 package com.android.mms.transaction;
 
 import android.content.Context;
-import android.net.NetworkUtilsHelper;
-import android.provider.Telephony;
-import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import com.android.mms.util.NetworkUtilsHelper;
+import android.util.Log;
 
 import com.android.mms.MmsConfig;
 import com.klinker.android.send_message.Transaction;
 import com.klinker.android.send_message.Utils;
 
-import com.android.mms.logs.LogTag;
+import com.android.mms.LogTag;
 
 /**
  * Container of transaction settings. Instances of this class are contained
@@ -35,23 +33,10 @@ import com.android.mms.logs.LogTag;
  */
 public class TransactionSettings {
     private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = true;
-    private static final boolean LOCAL_LOGV = false;
 
     private String mServiceCenter;
     private String mProxyAddress;
     private int mProxyPort = -1;
-
-    private static final String[] APN_PROJECTION = {
-            Telephony.Carriers.TYPE,            // 0
-            Telephony.Carriers.MMSC,            // 1
-            Telephony.Carriers.MMSPROXY,        // 2
-            Telephony.Carriers.MMSPORT          // 3
-    };
-    private static final int COLUMN_TYPE         = 0;
-    private static final int COLUMN_MMSC         = 1;
-    private static final int COLUMN_MMSPROXY     = 2;
-    private static final int COLUMN_MMSPORT      = 3;
 
     /**
      * Constructor that uses the default settings of the MMS Client.
@@ -172,7 +157,7 @@ public class TransactionSettings {
         mProxyAddress = proxyAddr;
         mProxyPort = proxyPort;
 
-        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, "TransactionSettings: " + mServiceCenter +
                     " proxyAddress: " + mProxyAddress +
                     " proxyPort: " + mProxyPort);
@@ -195,17 +180,4 @@ public class TransactionSettings {
         return (mProxyAddress != null) && (mProxyAddress.trim().length() != 0);
     }
 
-    static private boolean isValidApnType(String types, String requestType) {
-        // If APN type is unspecified, assume APN_TYPE_ALL.
-        if (TextUtils.isEmpty(types)) {
-            return true;
-        }
-
-        for (String t : types.split(",")) {
-            if (t.equals(requestType) || t.equals("*")) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

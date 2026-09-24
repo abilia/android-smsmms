@@ -16,7 +16,7 @@
 
 package com.google.android.mms.pdu_alt;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,7 +28,6 @@ import java.util.ArrayList;
  */
 public class EncodedStringValue implements Cloneable {
     private static final String TAG = "EncodedStringValue";
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     /**
@@ -245,21 +244,7 @@ public class EncodedStringValue implements Cloneable {
         }
     }
 
-    /**
-     * Concatenate an EncodedStringValue[] into a single String.
-     */
-    public static String concat(EncodedStringValue[] addr) {
-        StringBuilder sb = new StringBuilder();
-        int maxIndex = addr.length - 1;
-        for (int i = 0; i <= maxIndex; i++) {
-            sb.append(addr[i].getString());
-            if (i < maxIndex) {
-                sb.append(";");
-            }
-        }
 
-        return sb.toString();
-    }
 
     public static EncodedStringValue copy(EncodedStringValue value) {
         if (value == null) {
@@ -269,15 +254,4 @@ public class EncodedStringValue implements Cloneable {
         return new EncodedStringValue(value.mCharacterSet, value.mData);
     }
 
-    public static EncodedStringValue[] encodeStrings(String[] array) {
-        int count = array.length;
-        if (count > 0) {
-            EncodedStringValue[] encodedArray = new EncodedStringValue[count];
-            for (int i = 0; i < count; i++) {
-                encodedArray[i] = new EncodedStringValue(array[i]);
-            }
-            return encodedArray;
-        }
-        return null;
-    }
 }

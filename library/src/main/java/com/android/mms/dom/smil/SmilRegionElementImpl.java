@@ -16,13 +16,13 @@
 
 package com.android.mms.dom.smil;
 
-import com.android.mms.logs.LogTag;
+import android.util.Log;
+
+import com.android.mms.LogTag;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.smil.SMILDocument;
 import org.w3c.dom.smil.SMILRegionElement;
-
-import com.klinker.android.logger.Log;
 
 public class SmilRegionElementImpl extends SmilElementImpl implements
         SMILRegionElement {
@@ -48,7 +48,6 @@ public class SmilRegionElementImpl extends SmilElementImpl implements
     private static final String BOTTOM_ATTRIBUTE_NAME = "bottom";
     private static final String FIT_ATTRIBUTE_NAME = "fit";
     private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     SmilRegionElementImpl(SmilDocumentImpl owner, String tagName) {

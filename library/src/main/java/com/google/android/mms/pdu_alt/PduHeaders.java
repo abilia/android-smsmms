@@ -41,7 +41,6 @@ public class PduHeaders {
     public static final int MESSAGE_SIZE                    = 0x8E;
     public static final int PRIORITY                        = 0x8F;
 
-    public static final int READ_REPLY                      = 0x90;
     public static final int READ_REPORT                     = 0x90;
     public static final int REPORT_ALLOWED                  = 0x91;
     public static final int RESPONSE_STATUS                 = 0x92;
@@ -138,12 +137,7 @@ public class PduHeaders {
     public static final int VALUE_YES                       = 0x80;
     public static final int VALUE_NO                        = 0x81;
 
-    /**
-     *  Delivery-Time |
-     *  Expiry and Reply-Charging-Deadline |
-     *  field type components.
-     */
-    public static final int VALUE_ABSOLUTE_TOKEN            = 0x80;
+
     public static final int VALUE_RELATIVE_TOKEN            = 0x81;
 
     /**
@@ -151,7 +145,7 @@ public class PduHeaders {
      */
     public static final int MMS_VERSION_1_3                 = ((1 << 4) | 3);
     public static final int MMS_VERSION_1_2                 = ((1 << 4) | 2);
-    public static final int MMS_VERSION_1_1                 = ((1 << 4) | 1);
+
     public static final int MMS_VERSION_1_0                 = ((1 << 4) | 0);
 
     // Current version is 1.2.
@@ -163,7 +157,6 @@ public class PduHeaders {
     public static final int FROM_ADDRESS_PRESENT_TOKEN      = 0x80;
     public static final int FROM_INSERT_ADDRESS_TOKEN       = 0x81;
 
-    public static final String FROM_ADDRESS_PRESENT_TOKEN_STR = "address-present-token";
     public static final String FROM_INSERT_ADDRESS_TOKEN_STR = "insert-address-token";
 
     /**
@@ -171,19 +164,16 @@ public class PduHeaders {
      */
     public static final int STATUS_EXPIRED                  = 0x80;
     public static final int STATUS_RETRIEVED                = 0x81;
-    public static final int STATUS_REJECTED                 = 0x82;
+
     public static final int STATUS_DEFERRED                 = 0x83;
     public static final int STATUS_UNRECOGNIZED             = 0x84;
-    public static final int STATUS_INDETERMINATE            = 0x85;
-    public static final int STATUS_FORWARDED                = 0x86;
+
+
     public static final int STATUS_UNREACHABLE              = 0x87;
 
-    /**
-     *  MM-Flags field type components.
-     */
-    public static final int MM_FLAGS_ADD_TOKEN              = 0x80;
-    public static final int MM_FLAGS_REMOVE_TOKEN           = 0x81;
-    public static final int MM_FLAGS_FILTER_TOKEN           = 0x82;
+
+
+
 
     /**
      *  X-Mms-Message-Class field types.
@@ -209,34 +199,31 @@ public class PduHeaders {
      *  X-Mms-Response-Status field types.
      */
     public static final int RESPONSE_STATUS_OK                   = 0x80;
-    public static final int RESPONSE_STATUS_ERROR_UNSPECIFIED    = 0x81;
+
     public static final int RESPONSE_STATUS_ERROR_SERVICE_DENIED = 0x82;
 
-    public static final int RESPONSE_STATUS_ERROR_MESSAGE_FORMAT_CORRUPT     = 0x83;
     public static final int RESPONSE_STATUS_ERROR_SENDING_ADDRESS_UNRESOLVED = 0x84;
 
-    public static final int RESPONSE_STATUS_ERROR_MESSAGE_NOT_FOUND    = 0x85;
     public static final int RESPONSE_STATUS_ERROR_NETWORK_PROBLEM      = 0x86;
-    public static final int RESPONSE_STATUS_ERROR_CONTENT_NOT_ACCEPTED = 0x87;
+
     public static final int RESPONSE_STATUS_ERROR_UNSUPPORTED_MESSAGE  = 0x88;
     public static final int RESPONSE_STATUS_ERROR_TRANSIENT_FAILURE    = 0xC0;
 
-    public static final int RESPONSE_STATUS_ERROR_TRANSIENT_SENDNG_ADDRESS_UNRESOLVED = 0xC1;
     public static final int RESPONSE_STATUS_ERROR_TRANSIENT_MESSAGE_NOT_FOUND         = 0xC2;
-    public static final int RESPONSE_STATUS_ERROR_TRANSIENT_NETWORK_PROBLEM           = 0xC3;
+
     public static final int RESPONSE_STATUS_ERROR_TRANSIENT_PARTIAL_SUCCESS           = 0xC4;
 
     public static final int RESPONSE_STATUS_ERROR_PERMANENT_FAILURE                             = 0xE0;
     public static final int RESPONSE_STATUS_ERROR_PERMANENT_SERVICE_DENIED                      = 0xE1;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_MESSAGE_FORMAT_CORRUPT              = 0xE2;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_SENDING_ADDRESS_UNRESOLVED          = 0xE3;
+
+
     public static final int RESPONSE_STATUS_ERROR_PERMANENT_MESSAGE_NOT_FOUND                   = 0xE4;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_CONTENT_NOT_ACCEPTED                = 0xE5;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_REPLY_CHARGING_LIMITATIONS_NOT_MET  = 0xE6;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_REPLY_CHARGING_REQUEST_NOT_ACCEPTED = 0xE6;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_REPLY_CHARGING_FORWARDING_DENIED    = 0xE8;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_REPLY_CHARGING_NOT_SUPPORTED        = 0xE9;
-    public static final int RESPONSE_STATUS_ERROR_PERMANENT_ADDRESS_HIDING_NOT_SUPPORTED        = 0xEA;
+
+
+
+
+
+
     public static final int RESPONSE_STATUS_ERROR_PERMANENT_LACK_OF_PREPAID                     = 0xEB;
     public static final int RESPONSE_STATUS_ERROR_PERMANENT_END                                 = 0xFF;
 
@@ -245,19 +232,16 @@ public class PduHeaders {
      */
     public static final int RETRIEVE_STATUS_OK                                  = 0x80;
     public static final int RETRIEVE_STATUS_ERROR_TRANSIENT_FAILURE             = 0xC0;
-    public static final int RETRIEVE_STATUS_ERROR_TRANSIENT_MESSAGE_NOT_FOUND   = 0xC1;
+
     public static final int RETRIEVE_STATUS_ERROR_TRANSIENT_NETWORK_PROBLEM     = 0xC2;
     public static final int RETRIEVE_STATUS_ERROR_PERMANENT_FAILURE             = 0xE0;
-    public static final int RETRIEVE_STATUS_ERROR_PERMANENT_SERVICE_DENIED      = 0xE1;
-    public static final int RETRIEVE_STATUS_ERROR_PERMANENT_MESSAGE_NOT_FOUND   = 0xE2;
+
+
     public static final int RETRIEVE_STATUS_ERROR_PERMANENT_CONTENT_UNSUPPORTED = 0xE3;
     public static final int RETRIEVE_STATUS_ERROR_END                           = 0xFF;
 
-    /**
-     *  X-Mms-Sender-Visibility field types.
-     */
-    public static final int SENDER_VISIBILITY_HIDE          = 0x80;
-    public static final int SENDER_VISIBILITY_SHOW          = 0x81;
+
+
 
     /**
      *  X-Mms-Read-Status field types.
@@ -275,17 +259,17 @@ public class PduHeaders {
      *  X-Mms-Reply-Charging field types.
      */
     public static final int REPLY_CHARGING_REQUESTED           = 0x80;
-    public static final int REPLY_CHARGING_REQUESTED_TEXT_ONLY = 0x81;
-    public static final int REPLY_CHARGING_ACCEPTED            = 0x82;
+
+
     public static final int REPLY_CHARGING_ACCEPTED_TEXT_ONLY  = 0x83;
 
     /**
      *  X-Mms-MM-State field types.
      */
     public static final int MM_STATE_DRAFT                  = 0x80;
-    public static final int MM_STATE_SENT                   = 0x81;
-    public static final int MM_STATE_NEW                    = 0x82;
-    public static final int MM_STATE_RETRIEVED              = 0x83;
+
+
+
     public static final int MM_STATE_FORWARDED              = 0x84;
 
     /**
@@ -297,12 +281,12 @@ public class PduHeaders {
      *  X-Mms-Content-Class field types.
      */
     public static final int CONTENT_CLASS_TEXT              = 0x80;
-    public static final int CONTENT_CLASS_IMAGE_BASIC       = 0x81;
-    public static final int CONTENT_CLASS_IMAGE_RICH        = 0x82;
-    public static final int CONTENT_CLASS_VIDEO_BASIC       = 0x83;
-    public static final int CONTENT_CLASS_VIDEO_RICH        = 0x84;
-    public static final int CONTENT_CLASS_MEGAPIXEL         = 0x85;
-    public static final int CONTENT_CLASS_CONTENT_BASIC     = 0x86;
+
+
+
+
+
+
     public static final int CONTENT_CLASS_CONTENT_RICH      = 0x87;
 
     /**
@@ -312,9 +296,9 @@ public class PduHeaders {
     public static final int STORE_STATUS_ERROR_TRANSIENT_FAILURE                = 0xC0;
     public static final int STORE_STATUS_ERROR_TRANSIENT_NETWORK_PROBLEM        = 0xC1;
     public static final int STORE_STATUS_ERROR_PERMANENT_FAILURE                = 0xE0;
-    public static final int STORE_STATUS_ERROR_PERMANENT_SERVICE_DENIED         = 0xE1;
-    public static final int STORE_STATUS_ERROR_PERMANENT_MESSAGE_FORMAT_CORRUPT = 0xE2;
-    public static final int STORE_STATUS_ERROR_PERMANENT_MESSAGE_NOT_FOUND      = 0xE3;
+
+
+
     public static final int STORE_STATUS_ERROR_PERMANENT_MMBOX_FULL             = 0xE4;
     public static final int STORE_STATUS_ERROR_END                              = 0xFF;
 

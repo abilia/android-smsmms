@@ -16,6 +16,7 @@
 
 package com.android.mms.service_alt;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,7 +37,7 @@ import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
-import com.google.android.mms.util_alt.SqliteWrapper;
+import com.android.mms.SqliteWrapper;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Transaction;
 
@@ -81,7 +82,7 @@ public class DownloadRequest extends MmsRequest {
         final MmsHttpClient mmsHttpClient = netMgr.getOrCreateHttpClient();
         if (mmsHttpClient == null) {
             Log.e(TAG, "MMS network is not ready!");
-            throw new MmsHttpException(0/*statusCode*/, "MMS network is not ready");
+            throw new MmsHttpException(MmsHttpException.STATUS_IGNORE, "MMS network is not ready");
         }
         return mmsHttpClient.execute(
                 mLocationUrl,
@@ -326,7 +327,7 @@ public class DownloadRequest extends MmsRequest {
 
     private String getContentLocation(Context context, Uri uri)
             throws MmsException {
-        Cursor cursor = android.database.sqlite.SqliteWrapper.query(context, context.getContentResolver(),
+        Cursor cursor = SqliteWrapper.query(context, context.getContentResolver(),
                 uri, PROJECTION, null, null, null);
 
         if (cursor != null) {
@@ -344,10 +345,11 @@ public class DownloadRequest extends MmsRequest {
         throw new MmsException("Cannot get X-Mms-Content-Location from: " + uri);
     }
 
+    @SuppressLint("Range")
     private static Long getId(Context context, String location) {
         String selection = Telephony.Mms.CONTENT_LOCATION + " = ?";
         String[] selectionArgs = new String[] { location };
-        Cursor c = android.database.sqlite.SqliteWrapper.query(
+        Cursor c = SqliteWrapper.query(
                 context, context.getContentResolver(),
                 Telephony.Mms.CONTENT_URI, new String[] { Telephony.Mms._ID },
                 selection, selectionArgs, null);
@@ -373,7 +375,7 @@ public class DownloadRequest extends MmsRequest {
         uriBuilder.appendQueryParameter("protocol", "mms");
         uriBuilder.appendQueryParameter("message", String.valueOf(msgId));
 
-        Cursor cursor = android.database.sqlite.SqliteWrapper.query(context, context.getContentResolver(),
+        Cursor cursor = SqliteWrapper.query(context, context.getContentResolver(),
                 uriBuilder.build(), null, null, null, null);
         if (cursor == null) {
             return;
@@ -388,7 +390,7 @@ public class DownloadRequest extends MmsRequest {
                         Telephony.MmsSms.PendingMessages._ID);
                 long id = cursor.getLong(columnIndex);
 
-                android.database.sqlite.SqliteWrapper.update(context, context.getContentResolver(),
+                SqliteWrapper.update(context, context.getContentResolver(),
                         Telephony.MmsSms.PendingMessages.CONTENT_URI,
                         values, Telephony.MmsSms.PendingMessages._ID + "=" + id, null);
             }

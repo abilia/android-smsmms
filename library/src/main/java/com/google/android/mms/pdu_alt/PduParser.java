@@ -16,11 +16,10 @@
 
 package com.google.android.mms.pdu_alt;
 
-import com.android.mms.util.ExternalLogger;
+import android.util.Log;
+
 import com.google.android.mms.ContentType;
 import com.google.android.mms.InvalidHeaderValueException;
-
-import com.klinker.android.logger.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -82,7 +81,6 @@ public class PduParser {
      * The log tag.
      */
     private static final String LOG_TAG = "PduParser";
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     /**
@@ -204,7 +202,7 @@ public class PduParser {
                     // multipart/signed
                     return retrieveConf;
                 } else {
-                    ExternalLogger.logMessage(LOG_TAG, "Unsupported ContentType: " + ctTypeStr);
+                    log("Unsupported ContentType: " + ctTypeStr);
                 }
                 return null;
             case PduHeaders.MESSAGE_TYPE_DELIVERY_IND:

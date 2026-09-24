@@ -17,6 +17,7 @@
 package com.google.android.mms.pdu_alt;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -27,7 +28,6 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteException;
 import android.drm.DrmManagerClient;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Telephony;
 import android.provider.Telephony.Mms;
@@ -39,17 +39,16 @@ import android.provider.Telephony.Threads;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.mms.service_alt.SubscriptionIdChecker;
 import com.google.android.mms.ContentType;
 import com.google.android.mms.InvalidHeaderValueException;
 import com.google.android.mms.MmsException;
-import com.google.android.mms.util_alt.DownloadDrmHelper;
 import com.google.android.mms.util_alt.DrmConvertSession;
 import com.google.android.mms.util_alt.PduCache;
 import com.google.android.mms.util_alt.PduCacheEntry;
-import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
+import com.android.mms.SqliteWrapper;
 import com.klinker.android.send_message.Settings;
 
 import java.io.ByteArrayOutputStream;
@@ -70,11 +69,9 @@ import java.util.Set;
  */
 public class PduPersister {
     private static final String TAG = "PduPersister";
-    private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
     private static final long DUMMY_THREAD_ID = Long.MAX_VALUE;
-    private static final int DEFAULT_SUBSCRIPTION = 0;
     private static final int MAX_TEXT_BODY_SIZE = 300 * 1024;
 
     /**
@@ -82,18 +79,9 @@ public class PduPersister {
      */
     public static final String TEMPORARY_DRM_OBJECT_URI =
         "content://mms/" + Long.MAX_VALUE + "/part";
-    /**
-     * Indicate that we transiently failed to process a MM.
-     */
-    public static final int PROC_STATUS_TRANSIENT_FAILURE   = 1;
-    /**
-     * Indicate that we permanently failed to process a MM.
-     */
-    public static final int PROC_STATUS_PERMANENTLY_FAILURE = 2;
-    /**
-     * Indicate that we have successfully processed a MM.
-     */
-    public static final int PROC_STATUS_COMPLETED           = 3;
+
+    /** The MIME type of special DRM files */
+    public static final String MIMETYPE_DRM_MESSAGE = "application/vnd.oma.drm.message";
 
     private static PduPersister sPersister;
     private static final PduCache PDU_CACHE_INSTANCE;
@@ -699,7 +687,7 @@ public class PduPersister {
         }
     }
 
-    private static String getPartContentType(PduPart part) {
+    private String getPartContentType(PduPart part) {
         return part.getContentType() == null ? null : toIsoString(part.getContentType());
     }
 
@@ -769,7 +757,7 @@ public class PduPersister {
         return res;
     }
 
-    private static String cutString(String src, int expectSize) {
+    private String cutString(String src, int expectSize) {
         if (src.length() == 0) {
             return "";
         }
@@ -794,6 +782,16 @@ public class PduPersister {
             }
         }
         return builder.toString();
+    }
+
+    /**
+     * Checks if the Media Type needs to be DRM converted
+     *
+     * @param mimetype Media type of the content
+     * @return True if convert is needed else false
+     */
+    private boolean isDrmConvertNeeded(String mimetype) {
+        return MIMETYPE_DRM_MESSAGE.equals(mimetype);
     }
 
     /**
@@ -842,7 +840,7 @@ public class PduPersister {
                     }
                 }
             } else {
-                boolean isDrm = DownloadDrmHelper.isDrmConvertNeeded(contentType);
+                boolean isDrm = isDrmConvertNeeded(contentType);
                 if (isDrm) {
                     if (uri != null) {
                         try {
@@ -1528,7 +1526,7 @@ public class PduPersister {
         if (excludeMyNumber && array.length == 1 && addressType == PduHeaders.TO) {
             return;
         }
-        String myNumber = excludeMyNumber ? mTelephonyManager.getLine1Number() : null;
+        @SuppressLint("MissingPermission") String myNumber = excludeMyNumber ? mTelephonyManager.getLine1Number() : null;
         for (EncodedStringValue v : array) {
             if (v != null) {
                 String number = v.getString();
@@ -1637,8 +1635,7 @@ public class PduPersister {
      * Check if read permissions for SMS have been granted
      */
     private boolean checkReadSmsPermissions() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                mContext.checkSelfPermission(Manifest.permission.READ_SMS) ==
-                        PackageManager.PERMISSION_GRANTED;
+        return mContext.checkSelfPermission(Manifest.permission.READ_SMS) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 }

@@ -24,7 +24,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 public class MmsConfig {
     private static final String TAG = "MmsConfig";
@@ -34,13 +34,10 @@ public class MmsConfig {
     public static final String DEFAULT_HTTP_KEY_X_WAP_PROFILE = "x-wap-profile";
     public static final String DEFAULT_USER_AGENT = "Android-Mms/2.0";
 
-    private static final String MMS_APP_PACKAGE = "com.android.mms";
 
-    private static final String SMS_PROMO_DISMISSED_KEY = "sms_promo_dismissed_key";
 
     private static final int MAX_IMAGE_HEIGHT = 480;
     private static final int MAX_IMAGE_WIDTH = 640;
-    private static final int MAX_TEXT_LENGTH = 2000;
 
     /**
      * Whether to hide MMS functionality from the user (i.e. SMS only).

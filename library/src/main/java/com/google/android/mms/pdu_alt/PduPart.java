@@ -25,39 +25,36 @@ import java.util.Map;
  * The pdu part.
  */
 public class PduPart {
-    /**
-     * Well-Known Parameters.
-     */
-    public static final int P_Q                  = 0x80;
+
     public static final int P_CHARSET            = 0x81;
-    public static final int P_LEVEL              = 0x82;
+
     public static final int P_TYPE               = 0x83;
     public static final int P_DEP_NAME           = 0x85;
-    public static final int P_DEP_FILENAME       = 0x86;
-    public static final int P_DIFFERENCES        = 0x87;
-    public static final int P_PADDING            = 0x88;
+
+
+
     // This value of "TYPE" s used with Content-Type: multipart/related
     public static final int P_CT_MR_TYPE         = 0x89;
     public static final int P_DEP_START          = 0x8A;
-    public static final int P_DEP_START_INFO     = 0x8B;
-    public static final int P_DEP_COMMENT        = 0x8C;
-    public static final int P_DEP_DOMAIN         = 0x8D;
-    public static final int P_MAX_AGE            = 0x8E;
-    public static final int P_DEP_PATH           = 0x8F;
-    public static final int P_SECURE             = 0x90;
-    public static final int P_SEC                = 0x91;
-    public static final int P_MAC                = 0x92;
-    public static final int P_CREATION_DATE      = 0x93;
-    public static final int P_MODIFICATION_DATE  = 0x94;
-    public static final int P_READ_DATE          = 0x95;
-    public static final int P_SIZE               = 0x96;
+
+
+
+
+
+
+
+
+
+
+
+
     public static final int P_NAME               = 0x97;
     public static final int P_FILENAME           = 0x98;
     public static final int P_START              = 0x99;
-    public static final int P_START_INFO         = 0x9A;
-    public static final int P_COMMENT            = 0x9B;
-    public static final int P_DOMAIN             = 0x9C;
-    public static final int P_PATH               = 0x9D;
+
+
+
+
 
     /**
      *  Header field names.
@@ -76,12 +73,9 @@ public class PduPart {
      public static final String CONTENT_TRANSFER_ENCODING =
              "Content-Transfer-Encoding";
 
-     /**
-      * Value of Content-Transfer-Encoding.
-      */
-     public static final String P_BINARY = "binary";
-     public static final String P_7BIT = "7bit";
-     public static final String P_8BIT = "8bit";
+
+
+
      public static final String P_BASE64 = "base64";
      public static final String P_QUOTED_PRINTABLE = "quoted-printable";
 
@@ -118,7 +112,6 @@ public class PduPart {
       */
      private byte[] mPartData = null;
 
-     private static final String TAG = "PduPart";
 
      /**
       * Empty Constructor.
